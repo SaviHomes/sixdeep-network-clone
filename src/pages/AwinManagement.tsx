@@ -62,6 +62,15 @@ export default function AwinManagement() {
   };
 
   const handleImport = async () => {
+    if (!advertiserId) {
+      toast({
+        title: "Missing Advertiser ID",
+        description: "Please enter an Advertiser ID to import products",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsImporting(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -73,7 +82,7 @@ export default function AwinManagement() {
       const { data, error } = await supabase.functions.invoke('awin-import-products', {
         body: {
           categoryId: categoryId || null,
-          advertiserId: advertiserId || null,
+          advertiserId: advertiserId,
           limit: parseInt(limit) || 100,
         },
       });
@@ -88,9 +97,10 @@ export default function AwinManagement() {
       await loadImportLogs();
     } catch (error: any) {
       console.error('Import error:', error);
+      const errorMessage = error.message || "Failed to import products from Awin";
       toast({
         title: "Import Failed",
-        description: error.message || "Failed to import products from Awin",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -137,6 +147,15 @@ export default function AwinManagement() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="bg-muted/50 p-4 rounded-lg space-y-2 text-sm">
+            <p className="font-medium">Before importing:</p>
+            <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+              <li>Find your Advertiser ID in your Awin dashboard under "My Programmes"</li>
+              <li>The Advertiser ID is required - it identifies which merchant's products to import</li>
+              <li>Each import fetches products from a single advertiser</li>
+            </ol>
+          </div>
+
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="categoryId">Category ID (Optional)</Label>
@@ -149,13 +168,16 @@ export default function AwinManagement() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="advertiserId">Advertiser ID (Optional)</Label>
+              <Label htmlFor="advertiserId">
+                Advertiser ID <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="advertiserId"
                 placeholder="e.g., 5678"
                 value={advertiserId}
                 onChange={(e) => setAdvertiserId(e.target.value)}
                 disabled={isImporting}
+                required
               />
             </div>
             <div className="space-y-2">
@@ -172,7 +194,7 @@ export default function AwinManagement() {
           </div>
           <Button 
             onClick={handleImport} 
-            disabled={isImporting}
+            disabled={isImporting || !advertiserId}
             className="w-full md:w-auto"
           >
             {isImporting ? (

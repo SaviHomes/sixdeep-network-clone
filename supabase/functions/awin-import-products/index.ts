@@ -6,28 +6,32 @@ const corsHeaders = {
 };
 
 interface AwinProduct {
-  product_id: string;
-  product_name: string;
-  description: string;
-  merchant_id: string;
-  merchant_name: string;
-  category_id: string;
-  category_name: string;
-  aw_deep_link: string;
-  aw_image_url: string;
-  search_price: string;
-  currency: string;
-  in_stock: string;
-  stock_quantity: string;
-  advertiser_id: string;
-  advertiser_name: string;
-  merchant_product_id: string;
-  data_feed_id: string;
-  commission_group: {
-    group_id: string;
-    group_name: string;
-    group_code: string;
-  };
+  product_id?: string;
+  product_name?: string;
+  title?: string;
+  description?: string;
+  merchant_id?: string;
+  merchant_name?: string;
+  brand?: string;
+  category_id?: string;
+  category_name?: string;
+  aw_deep_link?: string;
+  link?: string;
+  aw_image_url?: string;
+  image_link?: string;
+  search_price?: string;
+  price?: string;
+  currency?: string;
+  in_stock?: string;
+  availability?: string;
+  stock_quantity?: string;
+  advertiser_id?: string;
+  advertiser_name?: string;
+  merchant_product_id?: string;
+  id?: string;
+  gtin?: string;
+  mpn?: string;
+  data_feed_id?: string;
 }
 
 Deno.serve(async (req) => {
@@ -86,32 +90,39 @@ Deno.serve(async (req) => {
 
     console.log('Starting Awin product import', { importLogId: importLog.id });
 
-    // Build Awin API URL
-    let awinUrl = `https://productdata.awin.com/datafeed/download/apikey/${awinApiToken}/language/en/fid/`;
-    
-    // Add filters
-    const params = new URLSearchParams();
-    if (categoryId) params.append('category', categoryId);
-    if (advertiserId) params.append('merchant', advertiserId);
-    params.append('columns', 'product_id,product_name,description,merchant_id,merchant_name,category_id,category_name,aw_deep_link,aw_image_url,search_price,currency,in_stock,stock_quantity,advertiser_id,advertiser_name,merchant_product_id,data_feed_id');
-    params.append('format', 'json');
-    params.append('limit', limit.toString());
+    // Validate required parameters
+    if (!advertiserId) {
+      throw new Error('Advertiser ID is required for Awin product import');
+    }
 
-    const fullUrl = `${awinUrl}?${params.toString()}`;
+    // Build Awin API URL - correct format from Awin documentation
+    // https://api.awin.com/publishers/{PUBLISHER_ID}/awinfeeds/download/{ADVERTISER_ID}-{VERTICAL}-{LOCALE}
+    const vertical = 'retail';
+    const locale = 'en_GB';
+    const awinUrl = `https://api.awin.com/publishers/${awinPublisherId}/awinfeeds/download/${advertiserId}-${vertical}-${locale}.jsonl`;
 
-    // Fetch products from Awin
-    const awinResponse = await fetch(fullUrl, {
+    console.log('Fetching from Awin API:', awinUrl);
+
+    // Fetch products from Awin using correct Bearer token authentication
+    const awinResponse = await fetch(awinUrl, {
       headers: {
         'Authorization': `Bearer ${awinApiToken}`,
       },
     });
 
     if (!awinResponse.ok) {
-      throw new Error(`Awin API error: ${awinResponse.status} ${awinResponse.statusText}`);
+      const errorText = await awinResponse.text();
+      console.error('Awin API error response:', errorText);
+      throw new Error(`Awin API error: ${awinResponse.status} ${awinResponse.statusText} - ${errorText}`);
     }
 
-    const awinData = await awinResponse.json();
-    const products: AwinProduct[] = awinData.products || [];
+    // Parse JSONL format (JSON Lines - one JSON object per line)
+    const responseText = await awinResponse.text();
+    const lines = responseText.trim().split('\n');
+    const products: AwinProduct[] = lines
+      .filter(line => line.trim())
+      .map(line => JSON.parse(line))
+      .slice(0, limit); // Apply limit
 
     console.log(`Fetched ${products.length} products from Awin`);
 
@@ -129,26 +140,27 @@ Deno.serve(async (req) => {
           .eq('awin_product_id', product.product_id)
           .maybeSingle();
 
+        // Handle both standard and Google format field names
         const productData = {
-          name: product.product_name,
-          description: product.description,
-          price: parseFloat(product.search_price) || 0,
-          affiliate_link: product.aw_deep_link,
-          image_url: product.aw_image_url,
-          awin_product_id: product.product_id,
-          awin_advertiser_id: product.advertiser_id,
-          awin_advertiser_name: product.advertiser_name,
-          merchant_product_id: product.merchant_product_id,
-          aw_deep_link: product.aw_deep_link,
-          aw_image_url: product.aw_image_url,
-          search_price: parseFloat(product.search_price) || 0,
-          merchant_name: product.merchant_name,
-          merchant_id: product.merchant_id,
-          currency: product.currency,
-          in_stock: product.in_stock === '1' || product.in_stock === 'true',
-          stock_quantity: parseInt(product.stock_quantity) || 0,
+          name: product.product_name || product.title || 'Unknown Product',
+          description: product.description || '',
+          price: parseFloat(product.search_price || product.price || '0') || 0,
+          affiliate_link: product.aw_deep_link || product.link || '',
+          image_url: product.aw_image_url || product.image_link || '',
+          awin_product_id: product.product_id || product.id || '',
+          awin_advertiser_id: product.advertiser_id || advertiserId,
+          awin_advertiser_name: product.advertiser_name || product.brand || '',
+          merchant_product_id: product.merchant_product_id || product.id || '',
+          aw_deep_link: product.aw_deep_link || product.link || '',
+          aw_image_url: product.aw_image_url || product.image_link || '',
+          search_price: parseFloat(product.search_price || product.price || '0') || 0,
+          merchant_name: product.merchant_name || product.brand || '',
+          merchant_id: product.merchant_id || advertiserId,
+          currency: product.currency || 'GBP',
+          in_stock: product.in_stock === '1' || product.in_stock === 'true' || product.availability === 'in stock',
+          stock_quantity: parseInt(product.stock_quantity || '0') || 0,
           last_synced_at: new Date().toISOString(),
-          data_feed_id: product.data_feed_id,
+          data_feed_id: product.data_feed_id || '',
           is_active: true,
         };
 
@@ -212,8 +224,9 @@ Deno.serve(async (req) => {
     );
   } catch (error) {
     console.error('Import error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
