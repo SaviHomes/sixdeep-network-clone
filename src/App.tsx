@@ -10,6 +10,7 @@ import HowItWorks from "./pages/HowItWorks";
 import Affiliate from "./pages/Affiliate";
 import Advertise from "./pages/Advertise";
 import AdvertiserLogin from "./pages/AdvertiserLogin";
+import AdvertiserRegister from "./pages/AdvertiserRegister";
 import FAQs from "./pages/FAQs";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/affiliate" element={<Affiliate />} />
           <Route path="/advertise" element={<Advertise />} />
           <Route path="/advertiser-login" element={<AdvertiserLogin />} />
+          <Route path="/advertiser-register" element={<AdvertiserRegister />} />
           <Route path="/faqs" element={<FAQs />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={<Admin />} />

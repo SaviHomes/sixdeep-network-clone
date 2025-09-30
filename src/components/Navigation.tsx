@@ -77,6 +77,19 @@ const Navigation = () => {
                       <li>
                         <NavigationMenuLink asChild>
                           <Link
+                            to="/advertiser-register"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-popover-foreground"
+                          >
+                            <div className="text-sm font-medium leading-none">Register as Advertiser</div>
+                            <p className="line-clamp-2 text-sm leading-snug opacity-80">
+                              Sign up to advertise
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link
                             to="/advertiser-login"
                             className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-popover-foreground"
                           >
@@ -181,6 +194,13 @@ const Navigation = () => {
                 className="block pl-4 py-2 hover:text-primary-foreground/80 transition-colors"
               >
                 About Advertising
+              </Link>
+              <Link
+                to="/advertiser-register"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block pl-4 py-2 hover:text-primary-foreground/80 transition-colors"
+              >
+                Register as Advertiser
               </Link>
               <Link
                 to="/advertiser-login"
