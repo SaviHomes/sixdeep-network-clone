@@ -59,7 +59,7 @@ const Navigation = () => {
                   <NavigationMenuTrigger className="text-primary-foreground hover:text-primary-foreground/80 bg-transparent hover:bg-transparent data-[state=open]:bg-transparent font-medium">
                     Advertise with us
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent className="bg-background">
+                  <NavigationMenuContent className="bg-popover z-50">
                     <ul className="w-48 p-2">
                       <li>
                         <NavigationMenuLink asChild>
