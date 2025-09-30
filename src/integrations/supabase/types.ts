@@ -611,6 +611,10 @@ export type Database = {
           id: string
           referrer_id: string | null
           short_link: string | null
+          subscription_expires_at: string | null
+          subscription_id: string | null
+          subscription_product_id: string | null
+          subscription_status: string | null
           total_earnings: number | null
           updated_at: string | null
           username: string
@@ -624,6 +628,10 @@ export type Database = {
           id: string
           referrer_id?: string | null
           short_link?: string | null
+          subscription_expires_at?: string | null
+          subscription_id?: string | null
+          subscription_product_id?: string | null
+          subscription_status?: string | null
           total_earnings?: number | null
           updated_at?: string | null
           username: string
@@ -637,6 +645,10 @@ export type Database = {
           id?: string
           referrer_id?: string | null
           short_link?: string | null
+          subscription_expires_at?: string | null
+          subscription_id?: string | null
+          subscription_product_id?: string | null
+          subscription_status?: string | null
           total_earnings?: number | null
           updated_at?: string | null
           username?: string
