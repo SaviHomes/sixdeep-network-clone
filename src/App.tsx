@@ -21,6 +21,7 @@ import EmailTemplates from "./pages/EmailTemplates";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import BioLinkPage from "./pages/BioLinkPage";
+import AwinManagement from "./pages/AwinManagement";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/email-templates" element={<EmailTemplates />} />
+          <Route path="/admin/awin" element={<AwinManagement />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/:username" element={<BioLinkPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

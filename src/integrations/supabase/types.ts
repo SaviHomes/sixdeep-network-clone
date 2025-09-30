@@ -56,6 +56,89 @@ export type Database = {
         }
         Relationships: []
       }
+      awin_category_mappings: {
+        Row: {
+          awin_category_id: string
+          awin_category_name: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          our_category_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          awin_category_id: string
+          awin_category_name: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          our_category_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          awin_category_id?: string
+          awin_category_name?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          our_category_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "awin_category_mappings_our_category_id_fkey"
+            columns: ["our_category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      awin_import_logs: {
+        Row: {
+          advertiser_filter: string | null
+          category_filter: string | null
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          error_message: string | null
+          id: string
+          products_failed: number | null
+          products_imported: number | null
+          products_updated: number | null
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          advertiser_filter?: string | null
+          category_filter?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          products_failed?: number | null
+          products_imported?: number | null
+          products_updated?: number | null
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          advertiser_filter?: string | null
+          category_filter?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          products_failed?: number | null
+          products_imported?: number | null
+          products_updated?: number | null
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       bio_link_analytics: {
         Row: {
           bio_link_id: string
@@ -557,39 +640,81 @@ export type Database = {
       products: {
         Row: {
           affiliate_link: string | null
+          aw_deep_link: string | null
+          aw_image_url: string | null
+          awin_advertiser_id: string | null
+          awin_advertiser_name: string | null
+          awin_product_id: string | null
           category_id: string | null
           commission_rate: number | null
           created_at: string | null
+          currency: string | null
+          data_feed_id: string | null
           description: string | null
           id: string
           image_url: string | null
+          in_stock: boolean | null
           is_active: boolean | null
+          last_synced_at: string | null
+          merchant_id: string | null
+          merchant_name: string | null
+          merchant_product_id: string | null
           name: string
           price: number
+          search_price: number | null
+          stock_quantity: number | null
         }
         Insert: {
           affiliate_link?: string | null
+          aw_deep_link?: string | null
+          aw_image_url?: string | null
+          awin_advertiser_id?: string | null
+          awin_advertiser_name?: string | null
+          awin_product_id?: string | null
           category_id?: string | null
           commission_rate?: number | null
           created_at?: string | null
+          currency?: string | null
+          data_feed_id?: string | null
           description?: string | null
           id?: string
           image_url?: string | null
+          in_stock?: boolean | null
           is_active?: boolean | null
+          last_synced_at?: string | null
+          merchant_id?: string | null
+          merchant_name?: string | null
+          merchant_product_id?: string | null
           name: string
           price: number
+          search_price?: number | null
+          stock_quantity?: number | null
         }
         Update: {
           affiliate_link?: string | null
+          aw_deep_link?: string | null
+          aw_image_url?: string | null
+          awin_advertiser_id?: string | null
+          awin_advertiser_name?: string | null
+          awin_product_id?: string | null
           category_id?: string | null
           commission_rate?: number | null
           created_at?: string | null
+          currency?: string | null
+          data_feed_id?: string | null
           description?: string | null
           id?: string
           image_url?: string | null
+          in_stock?: boolean | null
           is_active?: boolean | null
+          last_synced_at?: string | null
+          merchant_id?: string | null
+          merchant_name?: string | null
+          merchant_product_id?: string | null
           name?: string
           price?: number
+          search_price?: number | null
+          stock_quantity?: number | null
         }
         Relationships: [
           {
