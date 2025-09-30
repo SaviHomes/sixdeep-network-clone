@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Menu, X, User, Shield, LogOut } from "lucide-react";
+import { Menu, X, User, Shield, LogOut, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,6 +8,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/sixdeep-logo.webp";
 
@@ -18,7 +26,6 @@ const Navigation = () => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Shop", path: "/shop" },
-    { name: "Become an Affiliate", path: "/affiliate" },
     { name: "How It Works", path: "/how-it-works" },
     { name: "FAQs", path: "/faqs" },
     { name: "Contact", path: "/contact" },
@@ -44,6 +51,54 @@ const Navigation = () => {
                 {link.name}
               </Link>
             ))}
+            
+            {/* Advertise with us dropdown */}
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="text-primary-foreground hover:text-primary-foreground/80 bg-transparent hover:bg-transparent data-[state=open]:bg-transparent font-medium">
+                    Advertise with us
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent className="bg-background">
+                    <ul className="w-48 p-2">
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            to="/advertise"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium leading-none">About Advertising</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Learn about our platform
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            to="/advertiser-login"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium leading-none">Advertiser Login</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Access your dashboard
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+
+            <Link
+              to="/affiliate"
+              className="hover:text-primary-foreground/80 transition-colors font-medium"
+            >
+              Become an Affiliate
+            </Link>
           </div>
 
           {/* Account Button / User Menu */}
@@ -116,6 +171,33 @@ const Navigation = () => {
                 {link.name}
               </Link>
             ))}
+            
+            {/* Advertise with us mobile */}
+            <div className="py-2">
+              <p className="font-medium text-primary-foreground/80 mb-2">Advertise with us</p>
+              <Link
+                to="/advertise"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block pl-4 py-2 hover:text-primary-foreground/80 transition-colors"
+              >
+                About Advertising
+              </Link>
+              <Link
+                to="/advertiser-login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block pl-4 py-2 hover:text-primary-foreground/80 transition-colors"
+              >
+                Advertiser Login
+              </Link>
+            </div>
+
+            <Link
+              to="/affiliate"
+              className="block py-2 hover:text-primary-foreground/80 transition-colors font-medium"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Become an Affiliate
+            </Link>
             {!user ? (
               <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
                 <Button variant="secondary" size="sm" className="w-full">
