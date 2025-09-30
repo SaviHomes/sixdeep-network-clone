@@ -1,4 +1,4 @@
-import { Sparkles, Briefcase, Palette } from "lucide-react";
+import { Sparkles, Briefcase, Palette, BookOpen, Moon, Radio, Leaf, Crown, Cpu, Gamepad2, Shirt, Music, Dumbbell } from "lucide-react";
 
 export interface BioLinkTheme {
   id: string;
@@ -11,6 +11,7 @@ export interface BioLinkTheme {
 }
 
 export const bioLinkThemes: BioLinkTheme[] = [
+  // Free Themes
   {
     id: 'gradient',
     name: 'Gradient',
@@ -36,6 +37,39 @@ export const bioLinkThemes: BioLinkTheme[] = [
     category: 'free'
   },
   {
+    id: 'classic',
+    name: 'Classic',
+    description: 'Timeless design with elegant serif typography',
+    isPremium: false,
+    icon: BookOpen,
+    category: 'free'
+  },
+  {
+    id: 'dark',
+    name: 'Dark Mode',
+    description: 'Sleek dark background with neon accent highlights',
+    isPremium: false,
+    icon: Moon,
+    category: 'free'
+  },
+  {
+    id: 'retro',
+    name: 'Retro',
+    description: 'Nostalgic 80s-90s design with bold vibrant colors',
+    isPremium: false,
+    icon: Radio,
+    category: 'free'
+  },
+  {
+    id: 'nature',
+    name: 'Nature',
+    description: 'Organic design with earthy tones and natural feel',
+    isPremium: false,
+    icon: Leaf,
+    category: 'free'
+  },
+  // Premium Themes
+  {
     id: 'professional',
     name: 'Professional',
     description: 'Business-focused design with sophisticated layout',
@@ -57,6 +91,54 @@ export const bioLinkThemes: BioLinkTheme[] = [
     description: 'Instagram-inspired design with story highlights',
     isPremium: true,
     icon: Sparkles,
+    category: 'premium'
+  },
+  {
+    id: 'luxury',
+    name: 'Luxury',
+    description: 'Premium elegant design with gold accents and animations',
+    isPremium: true,
+    icon: Crown,
+    category: 'premium'
+  },
+  {
+    id: 'tech',
+    name: 'Tech',
+    description: 'Futuristic design with glowing effects and cyber aesthetics',
+    isPremium: true,
+    icon: Cpu,
+    category: 'premium'
+  },
+  {
+    id: 'gaming',
+    name: 'Gaming',
+    description: 'Dynamic gaming design with RGB effects and bold graphics',
+    isPremium: true,
+    icon: Gamepad2,
+    category: 'premium'
+  },
+  {
+    id: 'fashion',
+    name: 'Fashion',
+    description: 'Stylish magazine-inspired layout with editorial flair',
+    isPremium: true,
+    icon: Shirt,
+    category: 'premium'
+  },
+  {
+    id: 'music',
+    name: 'Music',
+    description: 'Audio-focused design with wave patterns and vibrant colors',
+    isPremium: true,
+    icon: Music,
+    category: 'premium'
+  },
+  {
+    id: 'fitness',
+    name: 'Fitness',
+    description: 'Energetic design with motivational elements and bold energy',
+    isPremium: true,
+    icon: Dumbbell,
     category: 'premium'
   }
 ];

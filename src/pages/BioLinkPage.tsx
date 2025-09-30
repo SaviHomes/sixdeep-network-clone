@@ -8,6 +8,16 @@ import ModernTheme from "@/components/BioLinkThemes/ModernTheme";
 import ProfessionalTheme from "@/components/BioLinkThemes/ProfessionalTheme";
 import CreativeTheme from "@/components/BioLinkThemes/CreativeTheme";
 import InfluencerTheme from "@/components/BioLinkThemes/InfluencerTheme";
+import ClassicTheme from "@/components/BioLinkThemes/ClassicTheme";
+import DarkTheme from "@/components/BioLinkThemes/DarkTheme";
+import RetroTheme from "@/components/BioLinkThemes/RetroTheme";
+import NatureTheme from "@/components/BioLinkThemes/NatureTheme";
+import LuxuryTheme from "@/components/BioLinkThemes/LuxuryTheme";
+import TechTheme from "@/components/BioLinkThemes/TechTheme";
+import GamingTheme from "@/components/BioLinkThemes/GamingTheme";
+import FashionTheme from "@/components/BioLinkThemes/FashionTheme";
+import MusicTheme from "@/components/BioLinkThemes/MusicTheme";
+import FitnessTheme from "@/components/BioLinkThemes/FitnessTheme";
 
 interface Profile {
   id: string;
@@ -231,6 +241,26 @@ const BioLinkPage = () => {
         return <CreativeTheme {...themeProps} />;
       case 'influencer':
         return <InfluencerTheme {...themeProps} />;
+      case 'classic':
+        return <ClassicTheme {...themeProps} />;
+      case 'dark':
+        return <DarkTheme {...themeProps} />;
+      case 'retro':
+        return <RetroTheme {...themeProps} />;
+      case 'nature':
+        return <NatureTheme {...themeProps} />;
+      case 'luxury':
+        return <LuxuryTheme {...themeProps} />;
+      case 'tech':
+        return <TechTheme {...themeProps} />;
+      case 'gaming':
+        return <GamingTheme {...themeProps} />;
+      case 'fashion':
+        return <FashionTheme {...themeProps} />;
+      case 'music':
+        return <MusicTheme {...themeProps} />;
+      case 'fitness':
+        return <FitnessTheme {...themeProps} />;
       case 'gradient':
       default:
         return <GradientTheme {...themeProps} />;
