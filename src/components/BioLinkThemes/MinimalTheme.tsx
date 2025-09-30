@@ -80,7 +80,7 @@ const MinimalTheme = ({
         {/* Join Network Button */}
         <div className="mb-8">
           <Button
-            onClick={onReferralClick}
+            onClick={() => window.location.href = '/auth?tab=registration'}
             className="w-full"
             size="lg"
           >

@@ -61,7 +61,7 @@ const Index = () => {
               and influencers build sustainable passive income streams.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/auth">
+              <Link to="/auth?tab=registration">
                 <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
                   Get Started Free
                   <ArrowRight className="ml-2 w-5 h-5" />

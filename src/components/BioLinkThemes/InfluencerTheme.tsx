@@ -96,7 +96,7 @@ const InfluencerTheme = ({
 
           {/* CTA Button */}
           <Button
-            onClick={onReferralClick}
+            onClick={() => window.location.href = '/auth?tab=registration'}
             size="lg"
             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 shadow-lg"
           >

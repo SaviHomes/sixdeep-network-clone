@@ -91,7 +91,7 @@ const CreativeTheme = ({
 
             {/* Join Button */}
             <Button
-              onClick={onReferralClick}
+              onClick={() => window.location.href = '/auth?tab=registration'}
               size="lg"
               className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-xl"
             >

@@ -39,6 +39,10 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   
+  // Check URL params for default tab
+  const searchParams = new URLSearchParams(window.location.search);
+  const defaultTab = searchParams.get('tab') === 'registration' ? 'registration' : 'login';
+  
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -232,7 +236,7 @@ const Auth = () => {
         <div className="max-w-md mx-auto">
           <h1 className="text-4xl font-bold text-center mb-2 text-foreground">Dashboard</h1>
           
-          <Tabs defaultValue="login" className="mt-8">
+          <Tabs defaultValue={defaultTab} className="mt-8">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="registration">Registration</TabsTrigger>

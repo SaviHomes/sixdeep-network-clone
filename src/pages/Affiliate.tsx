@@ -57,7 +57,7 @@ const Affiliate = () => {
               Turn your social media presence into a profitable business. 
               Join our affiliate program and start earning today!
             </p>
-            <Link to="/auth">
+            <Link to="/auth?tab=registration">
               <Button size="lg" className="text-lg px-8 py-6">
                 Get Started Free
               </Button>
@@ -135,7 +135,7 @@ const Affiliate = () => {
               Join thousands of influencers and content creators already building 
               their passive income with Sixdeep
             </p>
-            <Link to="/auth">
+            <Link to="/auth?tab=registration">
               <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
                 Create Your Free Account
               </Button>

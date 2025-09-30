@@ -91,7 +91,7 @@ const ProfessionalTheme = ({
             Join Our Professional Network
           </h2>
           <Button
-            onClick={onReferralClick}
+            onClick={() => window.location.href = '/auth?tab=registration'}
             size="lg"
             className="px-12"
           >

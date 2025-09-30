@@ -82,7 +82,7 @@ const ModernTheme = ({
 
           {/* Join Network Button */}
           <Button
-            onClick={onReferralClick}
+            onClick={() => window.location.href = '/auth?tab=registration'}
             size="lg"
             className="w-full shadow-md"
           >
