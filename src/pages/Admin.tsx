@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Shield, Database, Mail } from 'lucide-react';
+import { Shield, Database, Mail, Network } from 'lucide-react';
 import UserManagement from '@/components/UserManagement';
 
 const Admin = () => {
@@ -61,6 +61,29 @@ const Admin = () => {
           </Card>
 
           <UserManagement />
+
+          <Card className="mt-6 border-primary/20">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Network className="h-5 w-5 text-primary" />
+                <CardTitle>Affiliate Network Integration</CardTitle>
+              </div>
+              <CardDescription>
+                Manage Awin product imports and affiliate network settings
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Import products from Awin, manage category mappings, and monitor import operations. Connect to the Awin Product Data Feed API to automatically sync affiliate products.
+                </p>
+                <Button onClick={() => navigate('/admin/awin')} className="w-full">
+                  <Network className="h-4 w-4 mr-2" />
+                  Manage Awin Integration
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
           <Card className="mt-6 border-primary/20">
             <CardHeader>
