@@ -20,13 +20,15 @@ import {
   Plus,
   Trash2,
   Copy,
-  Check
+  Check,
+  Palette
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import SEO from "@/components/SEO";
 import { pageSEO } from "@/data/seoData";
 import SocialPlatformSelect from "@/components/SocialPlatformSelect";
 import { getPlatformById } from "@/utils/socialPlatforms";
+import ThemeSelector from "@/components/ThemeSelector";
 
 const AffiliateDashboard = () => {
   const { user, isLoading } = useAuth();
@@ -43,11 +45,13 @@ const AffiliateDashboard = () => {
     socialLinks,
     selectedCategories,
     isLoading: bioLinkLoading,
+    currentTheme,
     createBioLink,
     updateBioLink,
     addSocialLink,
     removeSocialLink,
     toggleCategory,
+    updateTheme,
   } = useBioLink(user?.id);
 
   useEffect(() => {
@@ -194,6 +198,7 @@ const AffiliateDashboard = () => {
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="biolink">Bio Link</TabsTrigger>
+            <TabsTrigger value="design">Design</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -368,6 +373,26 @@ const AffiliateDashboard = () => {
                 </Card>
               </>
             )}
+          </TabsContent>
+
+          <TabsContent value="design" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Palette className="h-5 w-5" />
+                  Bio Link Design
+                </CardTitle>
+                <CardDescription>
+                  Choose a theme for your bio link page
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ThemeSelector 
+                  currentTheme={currentTheme}
+                  onThemeSelect={updateTheme}
+                />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>

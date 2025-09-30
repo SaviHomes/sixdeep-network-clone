@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Share2, ExternalLink, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import SocialIcon from "@/components/SocialIcon";
+import MinimalTheme from "@/components/BioLinkThemes/MinimalTheme";
+import GradientTheme from "@/components/BioLinkThemes/GradientTheme";
+import ModernTheme from "@/components/BioLinkThemes/ModernTheme";
+import ProfessionalTheme from "@/components/BioLinkThemes/ProfessionalTheme";
+import CreativeTheme from "@/components/BioLinkThemes/CreativeTheme";
+import InfluencerTheme from "@/components/BioLinkThemes/InfluencerTheme";
 
 interface Profile {
   id: string;
@@ -20,6 +21,7 @@ interface BioLinkData {
   id: string;
   bio: string | null;
   theme_color: string;
+  theme_template?: string | null;
 }
 
 interface SocialLink {
@@ -96,7 +98,7 @@ const BioLinkPage = () => {
       // Fetch bio link
       const { data: bioLinkData, error: bioLinkError } = await supabase
         .from("bio_links")
-        .select("id, bio, theme_color")
+        .select("id, bio, theme_color, theme_template")
         .eq("user_id", profileData.id)
         .eq("is_active", true)
         .maybeSingle();
@@ -181,115 +183,61 @@ const BioLinkPage = () => {
 
   if (!profile || !bioLink) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted">
-        <Card className="p-8 text-center">
-          <h2 className="text-2xl font-bold mb-2">Bio link not found</h2>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2 text-foreground">Bio link not found</h2>
           <p className="text-muted-foreground mb-4">This user hasn't set up their bio link yet.</p>
-          <Button onClick={() => navigate("/")}>Go Home</Button>
-        </Card>
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted py-8 px-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Header with Share */}
-        <div className="flex justify-end mb-4">
-          <Button variant="ghost" size="sm" onClick={handleShare}>
-            <Share2 className="h-4 w-4 mr-2" />
-            Share
-          </Button>
-        </div>
+  const themeProps = {
+    profile: {
+      avatar_url: profile.avatar_url,
+      full_name: profile.full_name,
+      username: profile.username,
+    },
+    bioLink,
+    socialLinks: socialLinks.map(link => ({ 
+      id: link.platform, 
+      platform: link.platform, 
+      url: link.url 
+    })),
+    categories: categories.map(cat => ({
+      id: cat.id,
+      name: cat.name,
+      image_url: cat.image_url,
+    })),
+    onCategoryClick: (categoryId: string) => {
+      const category = categories.find(c => c.id === categoryId);
+      if (category) handleCategoryClick(category);
+    },
+    onReferralClick: handleReferralClick,
+    onShare: handleShare,
+  };
 
-        {/* Profile Section */}
-        <Card className="p-8 mb-6 text-center">
-          <Avatar className="h-24 w-24 mx-auto mb-4">
-            <AvatarImage src={profile.avatar_url || undefined} />
-            <AvatarFallback className="text-2xl">
-              {(profile.full_name || profile.username).charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          
-          <h1 className="text-2xl font-bold mb-2">{profile.full_name || profile.username}</h1>
-          <p className="text-muted-foreground mb-4">@{profile.username}</p>
-          
-          {bioLink.bio && (
-            <p className="text-sm text-muted-foreground max-w-md mx-auto">{bioLink.bio}</p>
-          )}
-        </Card>
+  const renderTheme = () => {
+    const theme = bioLink.theme_template || 'gradient';
+    
+    switch (theme) {
+      case 'minimal':
+        return <MinimalTheme {...themeProps} />;
+      case 'modern':
+        return <ModernTheme {...themeProps} />;
+      case 'professional':
+        return <ProfessionalTheme {...themeProps} />;
+      case 'creative':
+        return <CreativeTheme {...themeProps} />;
+      case 'influencer':
+        return <InfluencerTheme {...themeProps} />;
+      case 'gradient':
+      default:
+        return <GradientTheme {...themeProps} />;
+    }
+  };
 
-        {/* Social Links */}
-        {socialLinks.length > 0 && (
-          <div className="flex justify-center gap-4 mb-6">
-            {socialLinks.map((link, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                size="icon"
-                className="rounded-full hover:scale-110 transition-transform"
-                onClick={() => {
-                  trackClick("social_click", { platform: link.platform });
-                  window.open(link.url, "_blank");
-                }}
-              >
-                <SocialIcon platform={link.platform} />
-              </Button>
-            ))}
-          </div>
-        )}
-
-        {/* Join Network Button */}
-        <Card className="p-6 mb-6 text-center bg-primary/5 border-primary/20">
-          <Users className="h-8 w-8 mx-auto mb-3 text-primary" />
-          <h3 className="font-semibold mb-2">Join {profile.full_name || profile.username}'s Network</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            Sign up using my referral link and start earning commissions!
-          </p>
-          <Button onClick={handleReferralClick} className="w-full">
-            Join Network
-          </Button>
-        </Card>
-
-        {/* Product Categories */}
-        {categories.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold mb-4">Shop My Favorites</h2>
-            {categories.map((category) => (
-              <Card
-                key={category.id}
-                className="p-4 cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={() => handleCategoryClick(category)}
-              >
-                <div className="flex items-center gap-4">
-                  {category.image_url && (
-                    <img
-                      src={category.image_url}
-                      alt={category.name}
-                      className="h-16 w-16 rounded-lg object-cover"
-                    />
-                  )}
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{category.name}</h3>
-                    <p className="text-sm text-muted-foreground">Explore products</p>
-                  </div>
-                  <ExternalLink className="h-5 w-5 text-muted-foreground" />
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="text-center mt-12 text-sm text-muted-foreground">
-          <p>Create your own bio link at SixDeep</p>
-          <Button variant="link" onClick={() => navigate("/")}>
-            Get Started
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
+  return renderTheme();
 };
 
 export default BioLinkPage;

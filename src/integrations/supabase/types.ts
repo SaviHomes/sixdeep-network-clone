@@ -181,7 +181,10 @@ export type Database = {
           display_order: Json | null
           id: string
           is_active: boolean | null
+          is_premium_theme: boolean | null
           theme_color: string | null
+          theme_settings: Json | null
+          theme_template: string | null
           updated_at: string | null
           user_id: string
         }
@@ -191,7 +194,10 @@ export type Database = {
           display_order?: Json | null
           id?: string
           is_active?: boolean | null
+          is_premium_theme?: boolean | null
           theme_color?: string | null
+          theme_settings?: Json | null
+          theme_template?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -201,7 +207,10 @@ export type Database = {
           display_order?: Json | null
           id?: string
           is_active?: boolean | null
+          is_premium_theme?: boolean | null
           theme_color?: string | null
+          theme_settings?: Json | null
+          theme_template?: string | null
           updated_at?: string | null
           user_id?: string
         }

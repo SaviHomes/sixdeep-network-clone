@@ -15,6 +15,7 @@ export interface BioLink {
   user_id: string;
   bio: string | null;
   theme_color: string;
+  theme_template?: string;
   is_active: boolean;
 }
 
@@ -23,6 +24,7 @@ export const useBioLink = (userId: string | undefined) => {
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentTheme, setCurrentTheme] = useState<string>('gradient');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -46,6 +48,7 @@ export const useBioLink = (userId: string | undefined) => {
 
       if (bioLinkData) {
         setBioLink(bioLinkData);
+        setCurrentTheme(bioLinkData.theme_template || 'gradient');
 
         // Fetch social links
         const { data: socialLinksData, error: socialLinksError } = await supabase
@@ -227,16 +230,48 @@ export const useBioLink = (userId: string | undefined) => {
     }
   };
 
+  const updateTheme = async (themeId: string) => {
+    if (!bioLink) return;
+
+    try {
+      const { error } = await supabase
+        .from('bio_links')
+        .update({ 
+          theme_template: themeId,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', bioLink.id);
+
+      if (error) throw error;
+
+      setCurrentTheme(themeId);
+      setBioLink(prev => prev ? { ...prev, theme_template: themeId } : null);
+      
+      toast({
+        title: "Theme updated",
+        description: "Your bio link design has been changed",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error updating theme",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   return {
     bioLink,
     socialLinks,
     selectedCategories,
     isLoading,
+    currentTheme,
     createBioLink,
     updateBioLink,
     addSocialLink,
     removeSocialLink,
     toggleCategory,
+    updateTheme,
     refreshBioLink: fetchBioLink,
   };
 };
