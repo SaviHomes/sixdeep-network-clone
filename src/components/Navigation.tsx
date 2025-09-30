@@ -56,7 +56,7 @@ const Navigation = () => {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-primary-foreground hover:text-primary-foreground/80 bg-transparent hover:bg-transparent data-[state=open]:bg-transparent font-medium">
+                  <NavigationMenuTrigger className="text-primary-foreground hover:text-primary-foreground/80 bg-transparent hover:bg-transparent data-[state=open]:bg-transparent font-medium text-base">
                     Advertise with us
                   </NavigationMenuTrigger>
                   <NavigationMenuContent className="bg-popover z-50">
@@ -65,10 +65,10 @@ const Navigation = () => {
                         <NavigationMenuLink asChild>
                           <Link
                             to="/advertise"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-popover-foreground"
                           >
                             <div className="text-sm font-medium leading-none">About Advertising</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            <p className="line-clamp-2 text-sm leading-snug opacity-80">
                               Learn about our platform
                             </p>
                           </Link>
@@ -78,10 +78,10 @@ const Navigation = () => {
                         <NavigationMenuLink asChild>
                           <Link
                             to="/advertiser-login"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-popover-foreground"
                           >
                             <div className="text-sm font-medium leading-none">Advertiser Login</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            <p className="line-clamp-2 text-sm leading-snug opacity-80">
                               Access your dashboard
                             </p>
                           </Link>
