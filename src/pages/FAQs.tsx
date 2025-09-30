@@ -14,7 +14,7 @@ const FAQs = () => {
     },
     {
       question: "Is it free to join?",
-      answer: "Yes! Joining SixDeep is completely free. There are no signup fees, no monthly costs, and no hidden charges. You only earn commissions when sales are made through your network.",
+      answer: "Yes! Joining Sixdeep is completely free. There are no signup fees, no monthly costs, and no hidden charges. You only earn commissions when sales are made through your network.",
     },
     {
       question: "How do I get paid?",
@@ -61,7 +61,7 @@ const FAQs = () => {
               Frequently Asked Questions
             </h1>
             <p className="text-xl text-muted-foreground">
-              Everything you need to know about SixDeep
+              Everything you need to know about Sixdeep
             </p>
           </div>
 

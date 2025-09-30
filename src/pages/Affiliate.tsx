@@ -55,7 +55,7 @@ const Affiliate = () => {
         <section className="py-16">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-              Why Join SixDeep?
+              Why Join Sixdeep?
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {benefits.map((benefit, index) => (
@@ -119,7 +119,7 @@ const Affiliate = () => {
             </h2>
             <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
               Join thousands of influencers and content creators already building 
-              their passive income with SixDeep
+              their passive income with Sixdeep
             </p>
             <Link to="/auth">
               <Button size="lg" variant="secondary" className="text-lg px-8 py-6">

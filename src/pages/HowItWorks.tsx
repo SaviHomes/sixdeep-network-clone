@@ -53,7 +53,7 @@ const HowItWorks = () => {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            How SixDeep Works
+            How Sixdeep Works
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Build your affiliate network and earn commissions 6 levels deep. 

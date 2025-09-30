@@ -71,7 +71,7 @@ const Index = () => {
         <section className="py-20 bg-muted/30">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl md:text-5xl font-bold text-center mb-16">
-              Why Choose SixDeep?
+              Why Choose Sixdeep?
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((feature, index) => (
@@ -97,7 +97,7 @@ const Index = () => {
             </h2>
             <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
               Join thousands of influencers on TikTok, Instagram, YouTube, and more 
-              who are already earning with SixDeep
+              who are already earning with Sixdeep
             </p>
             <Link to="/affiliate">
               <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
