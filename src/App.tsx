@@ -16,6 +16,7 @@ import AdvertiserDashboard from "./pages/AdvertiserDashboard";
 import FAQs from "./pages/FAQs";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
+import EmailTemplates from "./pages/EmailTemplates";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import BioLinkPage from "./pages/BioLinkPage";
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/faqs" element={<FAQs />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/email-templates" element={<EmailTemplates />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/:username" element={<BioLinkPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

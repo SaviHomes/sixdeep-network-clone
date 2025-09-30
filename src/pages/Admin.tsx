@@ -1,10 +1,13 @@
 import { useAdmin } from '@/hooks/useAdmin';
+import { useNavigate } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, Database } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Shield, Database, Mail } from 'lucide-react';
 
 const Admin = () => {
   const { isLoading } = useAdmin();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -52,6 +55,29 @@ const Admin = () => {
                     To access the backend dashboard, use the "View Backend" button in the Lovable editor sidebar.
                   </p>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mt-6 border-primary/20">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Mail className="h-5 w-5 text-primary" />
+                <CardTitle>Email Template System</CardTitle>
+              </div>
+              <CardDescription>
+                Manage automated email templates and event-based triggers
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Configure and manage email templates that are automatically sent based on system events like user signups, bio link creation, and commission earnings.
+                </p>
+                <Button onClick={() => navigate('/admin/email-templates')} className="w-full">
+                  <Mail className="h-4 w-4 mr-2" />
+                  Manage Email Templates
+                </Button>
               </div>
             </CardContent>
           </Card>

@@ -301,6 +301,250 @@ export type Database = {
           },
         ]
       }
+      email_events: {
+        Row: {
+          available_variables: Json | null
+          created_at: string | null
+          event_description: string | null
+          event_name: string
+          id: string
+          is_active: boolean | null
+        }
+        Insert: {
+          available_variables?: Json | null
+          created_at?: string | null
+          event_description?: string | null
+          event_name: string
+          id?: string
+          is_active?: boolean | null
+        }
+        Update: {
+          available_variables?: Json | null
+          created_at?: string | null
+          event_description?: string | null
+          event_name?: string
+          id?: string
+          is_active?: boolean | null
+        }
+        Relationships: []
+      }
+      email_logs: {
+        Row: {
+          clicked_at: string | null
+          error_message: string | null
+          event_id: string | null
+          id: string
+          metadata: Json | null
+          opened_at: string | null
+          recipient_email: string
+          recipient_user_id: string | null
+          sent_at: string | null
+          status: string
+          subject: string
+          template_id: string | null
+        }
+        Insert: {
+          clicked_at?: string | null
+          error_message?: string | null
+          event_id?: string | null
+          id?: string
+          metadata?: Json | null
+          opened_at?: string | null
+          recipient_email: string
+          recipient_user_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+          template_id?: string | null
+        }
+        Update: {
+          clicked_at?: string | null
+          error_message?: string | null
+          event_id?: string | null
+          id?: string
+          metadata?: Json | null
+          opened_at?: string | null
+          recipient_email?: string
+          recipient_user_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          template_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_logs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "email_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_logs_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_template_content: {
+        Row: {
+          created_at: string | null
+          html_content: string
+          id: string
+          is_current: boolean | null
+          template_id: string
+          text_content: string | null
+          version: number
+        }
+        Insert: {
+          created_at?: string | null
+          html_content: string
+          id?: string
+          is_current?: boolean | null
+          template_id: string
+          text_content?: string | null
+          version?: number
+        }
+        Update: {
+          created_at?: string | null
+          html_content?: string
+          id?: string
+          is_current?: boolean | null
+          template_id?: string
+          text_content?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_template_content_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_template_events: {
+        Row: {
+          conditions: Json | null
+          created_at: string | null
+          event_id: string
+          id: string
+          is_enabled: boolean | null
+          send_delay_minutes: number | null
+          template_id: string
+        }
+        Insert: {
+          conditions?: Json | null
+          created_at?: string | null
+          event_id: string
+          id?: string
+          is_enabled?: boolean | null
+          send_delay_minutes?: number | null
+          template_id: string
+        }
+        Update: {
+          conditions?: Json | null
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          is_enabled?: boolean | null
+          send_delay_minutes?: number | null
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_template_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "email_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_template_events_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_template_variables: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_required: boolean | null
+          template_id: string
+          variable_description: string | null
+          variable_name: string
+          variable_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_required?: boolean | null
+          template_id: string
+          variable_description?: string | null
+          variable_name: string
+          variable_type?: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_required?: boolean | null
+          template_id?: string
+          variable_description?: string | null
+          variable_name?: string
+          variable_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_template_variables_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_templates: {
+        Row: {
+          category: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          status: string
+          subject: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          status?: string
+          subject: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          status?: string
+          subject?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           affiliate_link: string | null
