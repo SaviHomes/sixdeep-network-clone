@@ -5,6 +5,74 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// CSV parsing function for Awin product feeds
+function parseCSV(csvContent: string): AwinProduct[] {
+  const lines = csvContent.split('\n').filter(line => line.trim());
+  if (lines.length < 2) return [];
+
+  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+  const products: AwinProduct[] = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const values = parseCSVLine(lines[i]);
+    if (values.length !== headers.length) continue;
+
+    const product: any = {};
+    headers.forEach((header, index) => {
+      product[header] = values[index];
+    });
+
+    // Map core CSV fields to AwinProduct interface (only required fields)
+    products.push({
+      product_id: product.product_id || product.aw_product_id || product.id,
+      product_name: product.product_name || product.name || product.title,
+      merchant_product_id: product.merchant_product_id || product.id,
+      merchant_image_url: product.merchant_image_url || product.image_url || product.aw_image_url,
+      description: product.description,
+      category_name: product.category_name || product.merchant_category,
+      search_price: product.search_price || product.price || '0',
+      merchant_name: product.merchant_name || product.advertiser_name || product.brand,
+      merchant_id: product.merchant_id || product.advertiser_id,
+      category_id: product.category_id,
+      aw_deep_link: product.aw_deep_link || product.deep_link || product.link,
+      currency: product.currency || 'GBP',
+      in_stock: product.in_stock === '1' || product.in_stock === 'true' || product.in_stock === 'in stock' || product.availability === 'in stock' ? '1' : '0',
+      stock_quantity: product.stock_quantity || '0',
+      advertiser_id: product.advertiser_id || product.merchant_id,
+      advertiser_name: product.advertiser_name || product.merchant_name || product.brand,
+      aw_image_url: product.aw_image_url || product.merchant_image_url || product.image_link,
+      data_feed_id: product.data_feed_id,
+      gtin: product.gtin || product.product_gtin || product.ean,
+      mpn: product.mpn
+    });
+  }
+
+  return products;
+}
+
+// Helper function to parse CSV line handling quoted values
+function parseCSVLine(line: string): string[] {
+  const values: string[] = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      values.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  
+  values.push(current.trim());
+  return values.map(v => v.replace(/^"|"$/g, ''));
+}
+
 interface AwinProduct {
   product_id?: string;
   product_name?: string;
@@ -12,6 +80,8 @@ interface AwinProduct {
   description?: string;
   merchant_id?: string;
   merchant_name?: string;
+  merchant_image_url?: string;
+  merchant_product_id?: string;
   brand?: string;
   category_id?: string;
   category_name?: string;
@@ -27,7 +97,6 @@ interface AwinProduct {
   stock_quantity?: string;
   advertiser_id?: string;
   advertiser_name?: string;
-  merchant_product_id?: string;
   id?: string;
   gtin?: string;
   mpn?: string;
@@ -53,7 +122,8 @@ Deno.serve(async (req) => {
     const { 
       categoryId, 
       advertiserId, 
-      limit = 100 
+      limit = 100,
+      csvContent 
     } = await req.json();
 
     // Get auth user
@@ -83,7 +153,7 @@ Deno.serve(async (req) => {
       .insert({
         status: 'running',
         category_filter: categoryId,
-        advertiser_filter: advertiserId,
+        advertiser_filter: csvContent ? 'CSV Upload' : advertiserId,
         created_by: user.id,
       })
       .select()
@@ -94,10 +164,18 @@ Deno.serve(async (req) => {
 
     console.log('Starting Awin product import', { importLogId: importLog.id });
 
-    // Validate required parameters
-    if (!advertiserId) {
-      throw new Error('Advertiser ID is required for Awin product import');
-    }
+    let products: AwinProduct[] = [];
+
+    // Handle CSV upload or API import
+    if (csvContent) {
+      console.log('Processing CSV upload...');
+      products = parseCSV(csvContent);
+      console.log(`Parsed ${products.length} products from CSV`);
+    } else {
+      // Validate required parameters for API import
+      if (!advertiserId) {
+        throw new Error('Advertiser ID is required for API import');
+      }
 
     // Build Awin API URL - correct format from Awin documentation
     // https://api.awin.com/publishers/{PUBLISHER_ID}/awinfeeds/download/{ADVERTISER_ID}-{VERTICAL}-{LOCALE}
@@ -141,44 +219,44 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (!awinResponse || !awinResponse.ok) {
-      console.error('All format attempts failed. Last error:', lastError);
-      throw new Error(`Unable to fetch feed for advertiser ${advertiserId}. Please verify:\n1. Advertiser ID is correct\n2. You have access to this advertiser's program\n3. The advertiser has an active product feed\n\nLast error: ${lastError}`);
-    }
-
-    // Parse response based on format
-    const responseText = await awinResponse.text();
-    let products: AwinProduct[] = [];
-
-    if (successfulFormat === '.jsonl' || successfulFormat === '') {
-      // Parse JSONL format (JSON Lines - one JSON object per line)
-      const lines = responseText.trim().split('\n');
-      products = lines
-        .filter(line => line.trim())
-        .map(line => {
-          try {
-            return JSON.parse(line);
-          } catch (e) {
-            console.error('Failed to parse line:', line);
-            return null;
-          }
-        })
-        .filter(p => p !== null)
-        .slice(0, limit);
-    } else if (successfulFormat === '.json') {
-      // Parse standard JSON array
-      try {
-        const jsonData = JSON.parse(responseText);
-        products = (Array.isArray(jsonData) ? jsonData : jsonData.products || []).slice(0, limit);
-      } catch (e) {
-        console.error('Failed to parse JSON:', e);
-        throw new Error('Invalid JSON format in response');
+      if (!awinResponse || !awinResponse.ok) {
+        console.error('All format attempts failed. Last error:', lastError);
+        throw new Error(`Unable to fetch feed for advertiser ${advertiserId}. Please verify:\n1. Advertiser ID is correct\n2. You have access to this advertiser's program\n3. The advertiser has an active product feed\n\nLast error: ${lastError}`);
       }
-    } else if (successfulFormat === '.csv') {
-      throw new Error('CSV format is not yet supported. Please contact support to enable CSV parsing.');
-    }
 
-    console.log(`Successfully parsed ${products.length} products from Awin feed (format: ${successfulFormat})`);
+      // Parse response based on format
+      const responseText = await awinResponse.text();
+
+      if (successfulFormat === '.jsonl' || successfulFormat === '') {
+        // Parse JSONL format (JSON Lines - one JSON object per line)
+        const lines = responseText.trim().split('\n');
+        products = lines
+          .filter(line => line.trim())
+          .map(line => {
+            try {
+              return JSON.parse(line);
+            } catch (e) {
+              console.error('Failed to parse line:', line);
+              return null;
+            }
+          })
+          .filter(p => p !== null)
+          .slice(0, limit);
+      } else if (successfulFormat === '.json') {
+        // Parse standard JSON array
+        try {
+          const jsonData = JSON.parse(responseText);
+          products = (Array.isArray(jsonData) ? jsonData : jsonData.products || []).slice(0, limit);
+        } catch (e) {
+          console.error('Failed to parse JSON:', e);
+          throw new Error('Invalid JSON format in response');
+        }
+      } else if (successfulFormat === '.csv') {
+        products = parseCSV(responseText);
+      }
+
+      console.log(`Successfully parsed ${products.length} products from Awin feed (format: ${successfulFormat})`);
+    }
 
     let imported = 0;
     let updated = 0;
@@ -269,16 +347,15 @@ Deno.serve(async (req) => {
       imported, 
       updated, 
       failed, 
-      total: products.length,
-      format: successfulFormat 
+      total: products.length
     });
 
     return new Response(
       JSON.stringify({
         success: true,
-        imported,
-        updated,
-        failed,
+        productsImported: imported,
+        productsUpdated: updated,
+        productsFailed: failed,
         total: products.length,
       }),
       {
