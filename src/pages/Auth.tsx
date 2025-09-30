@@ -80,8 +80,22 @@ const Auth = () => {
       }
 
       if (data.user) {
+        // Check if user is an admin
+        const { data: roles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', data.user.id);
+
+        const isAdmin = roles?.some(r => r.role === 'admin');
+        
         toast.success('Welcome back!');
-        navigate('/affiliate');
+        
+        // Redirect based on role
+        if (isAdmin) {
+          navigate('/admin');
+        } else {
+          navigate('/affiliate-dashboard');
+        }
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
