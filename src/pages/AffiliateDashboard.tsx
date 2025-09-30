@@ -194,14 +194,13 @@ const AffiliateDashboard = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="overview" className="space-y-6">
+        <Tabs defaultValue="biolink" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="biolink">Bio Link</TabsTrigger>
             <TabsTrigger value="design">Design</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-6">
+          <TabsContent value="biolink" className="space-y-6">
             <div className="grid gap-6 md:grid-cols-2">
               <Card>
                 <CardHeader>
@@ -235,9 +234,7 @@ const AffiliateDashboard = () => {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
 
-          <TabsContent value="biolink" className="space-y-6">
             {!bioLink ? (
               <Card>
                 <CardHeader>
