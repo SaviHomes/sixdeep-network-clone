@@ -1,11 +1,19 @@
 import { Link } from "react-router-dom";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X, User, Shield, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/sixdeep-logo.webp";
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, isAdmin, isLoading, logout } = useAuth();
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -38,14 +46,52 @@ const Navigation = () => {
             ))}
           </div>
 
-          {/* Account Button */}
+          {/* Account Button / User Menu */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/auth">
-              <Button variant="secondary" size="sm">
-                <User className="w-4 h-4 mr-2" />
-                My Account
-              </Button>
-            </Link>
+            {!user ? (
+              <Link to="/auth">
+                <Button variant="secondary" size="sm">
+                  <User className="w-4 h-4 mr-2" />
+                  My Account
+                </Button>
+              </Link>
+            ) : isAdmin ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="secondary" size="sm">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Logged in as Admin
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-background z-50">
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin" className="flex items-center cursor-pointer">
+                      <Shield className="w-4 h-4 mr-2" />
+                      Admin Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout} className="cursor-pointer">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="secondary" size="sm">
+                    <User className="w-4 h-4 mr-2" />
+                    {user.email}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-background z-50">
+                  <DropdownMenuItem onClick={logout} className="cursor-pointer">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -70,12 +116,48 @@ const Navigation = () => {
                 {link.name}
               </Link>
             ))}
-            <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
-              <Button variant="secondary" size="sm" className="w-full">
-                <User className="w-4 h-4 mr-2" />
-                My Account
+            {!user ? (
+              <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button variant="secondary" size="sm" className="w-full">
+                  <User className="w-4 h-4 mr-2" />
+                  My Account
+                </Button>
+              </Link>
+            ) : isAdmin ? (
+              <>
+                <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="secondary" size="sm" className="w-full">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Admin Dashboard
+                  </Button>
+                </Link>
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => {
+                    logout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                className="w-full"
+                onClick={() => {
+                  logout();
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
               </Button>
-            </Link>
+            )}
           </div>
         )}
       </div>
