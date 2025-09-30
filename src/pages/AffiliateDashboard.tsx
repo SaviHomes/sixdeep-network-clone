@@ -29,6 +29,7 @@ import { pageSEO } from "@/data/seoData";
 import SocialPlatformSelect from "@/components/SocialPlatformSelect";
 import { getPlatformById } from "@/utils/socialPlatforms";
 import ThemeSelector from "@/components/ThemeSelector";
+import BioLinkPreview from "@/components/BioLinkPreview";
 
 const AffiliateDashboard = () => {
   const { user, isLoading } = useAuth();
@@ -377,27 +378,67 @@ const AffiliateDashboard = () => {
           </TabsContent>
 
           <TabsContent value="design" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="h-5 w-5" />
-                  Bio Link Design
-                </CardTitle>
-                <CardDescription>
-                  Choose a theme for your bio link page
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ThemeSelector 
-                  currentTheme={currentTheme}
-                  onThemeSelect={updateTheme}
-                  onPreview={previewThemeChange}
-                  onClearPreview={clearPreview}
-                  isPreviewMode={isPreviewMode}
-                  previewTheme={previewTheme}
-                />
-              </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Theme Selector */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Palette className="h-5 w-5" />
+                    Bio Link Design
+                  </CardTitle>
+                  <CardDescription>
+                    Choose a theme for your bio link page
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ThemeSelector 
+                    currentTheme={currentTheme}
+                    onThemeSelect={updateTheme}
+                    onPreview={previewThemeChange}
+                    onClearPreview={clearPreview}
+                    isPreviewMode={isPreviewMode}
+                    previewTheme={previewTheme}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Live Preview */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ExternalLink className="h-5 w-5" />
+                    Live Preview
+                  </CardTitle>
+                  <CardDescription>
+                    {isPreviewMode 
+                      ? "Previewing theme - click 'Apply Theme' to save" 
+                      : "See how your bio link looks"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="aspect-[9/16] max-h-[600px] w-full">
+                    {profile && bioLink && (
+                      <BioLinkPreview
+                        theme={currentTheme}
+                        profile={{
+                          avatar_url: profile.avatar_url,
+                          full_name: profile.full_name,
+                          username: profile.username
+                        }}
+                        bioLink={{
+                          bio: bioLink.bio,
+                          theme_color: bioLink.theme_color
+                        }}
+                        socialLinks={socialLinks}
+                        categories={categories.filter(cat => 
+                          selectedCategories.includes(cat.id)
+                        )}
+                      />
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </main>
