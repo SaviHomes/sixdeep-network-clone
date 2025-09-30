@@ -18,6 +18,8 @@ import GamingTheme from "@/components/BioLinkThemes/GamingTheme";
 import FashionTheme from "@/components/BioLinkThemes/FashionTheme";
 import MusicTheme from "@/components/BioLinkThemes/MusicTheme";
 import FitnessTheme from "@/components/BioLinkThemes/FitnessTheme";
+import HalloweenTheme from "@/components/BioLinkThemes/HalloweenTheme";
+import ChristmasTheme from "@/components/BioLinkThemes/ChristmasTheme";
 
 interface Profile {
   id: string;
@@ -230,6 +232,20 @@ const BioLinkPage = () => {
   const renderTheme = () => {
     const theme = bioLink.theme_template || 'gradient';
     
+    // Extract props suitable for simplified themes
+    const simplifiedProps = {
+      bio: bioLink.bio,
+      socialLinks: socialLinks.map(link => ({
+        id: link.platform,
+        platform: link.platform,
+        url: link.url,
+        display_order: 0,
+        is_visible: true
+      })),
+      avatarUrl: profile.avatar_url,
+      fullName: profile.full_name
+    };
+    
     switch (theme) {
       case 'minimal':
         return <MinimalTheme {...themeProps} />;
@@ -249,6 +265,10 @@ const BioLinkPage = () => {
         return <RetroTheme {...themeProps} />;
       case 'nature':
         return <NatureTheme {...themeProps} />;
+      case 'halloween':
+        return <HalloweenTheme {...simplifiedProps} />;
+      case 'christmas':
+        return <ChristmasTheme {...simplifiedProps} />;
       case 'luxury':
         return <LuxuryTheme {...themeProps} />;
       case 'tech':

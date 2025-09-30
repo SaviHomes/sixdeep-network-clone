@@ -4,6 +4,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 
+interface SubscriptionStatus {
+  subscribed: boolean;
+  product_id: string | null;
+  subscription_end: string | null;
+}
+
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -11,6 +17,11 @@ export const useAuth = () => {
   const [isAdvertiser, setIsAdvertiser] = useState(false);
   const [isAffiliate, setIsAffiliate] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus>({
+    subscribed: false,
+    product_id: null,
+    subscription_end: null
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,6 +31,7 @@ export const useAuth = () => {
       setUser(session?.user ?? null);
       if (session?.user) {
         checkAdminStatus(session.user.id);
+        checkSubscription(session);
       } else {
         setIsLoading(false);
       }
@@ -33,6 +45,7 @@ export const useAuth = () => {
       if (session?.user) {
         setTimeout(() => {
           checkAdminStatus(session.user.id);
+          checkSubscription(session);
         }, 0);
       } else {
         setIsAdmin(false);
@@ -71,6 +84,33 @@ export const useAuth = () => {
     }
   };
 
+  const checkSubscription = async (session: Session | null) => {
+    if (!session) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Error checking subscription:', error);
+        return;
+      }
+
+      setSubscriptionStatus(data);
+    } catch (error) {
+      console.error('Error in subscription check:', error);
+    }
+  };
+
+  const refreshSubscription = async () => {
+    if (session) {
+      await checkSubscription(session);
+    }
+  };
+
   const logout = async () => {
     try {
       await supabase.auth.signOut();
@@ -97,6 +137,8 @@ export const useAuth = () => {
     isAdvertiser,
     isAffiliate,
     isLoading,
+    subscriptionStatus,
+    refreshSubscription,
     logout,
   };
 };

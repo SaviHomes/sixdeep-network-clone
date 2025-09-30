@@ -25,6 +25,7 @@ export const useBioLink = (userId: string | undefined) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentTheme, setCurrentTheme] = useState<string>('gradient');
+  const [previewTheme, setPreviewTheme] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -245,6 +246,7 @@ export const useBioLink = (userId: string | undefined) => {
       if (error) throw error;
 
       setCurrentTheme(themeId);
+      setPreviewTheme(null); // Clear any preview when saving
       setBioLink(prev => prev ? { ...prev, theme_template: themeId } : null);
       
       toast({
@@ -260,18 +262,30 @@ export const useBioLink = (userId: string | undefined) => {
     }
   };
 
+  const previewThemeChange = (themeId: string) => {
+    setPreviewTheme(themeId);
+  };
+
+  const clearPreview = () => {
+    setPreviewTheme(null);
+  };
+
   return {
     bioLink,
     socialLinks,
     selectedCategories,
     isLoading,
-    currentTheme,
+    currentTheme: previewTheme || currentTheme,
+    isPreviewMode: previewTheme !== null,
+    previewTheme,
     createBioLink,
     updateBioLink,
     addSocialLink,
     removeSocialLink,
     toggleCategory,
     updateTheme,
+    previewThemeChange,
+    clearPreview,
     refreshBioLink: fetchBioLink,
   };
 };

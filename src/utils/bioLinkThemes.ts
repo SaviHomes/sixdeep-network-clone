@@ -1,4 +1,4 @@
-import { Sparkles, Briefcase, Palette, BookOpen, Moon, Radio, Leaf, Crown, Cpu, Gamepad2, Shirt, Music, Dumbbell } from "lucide-react";
+import { Sparkles, Briefcase, Palette, BookOpen, Moon, Radio, Leaf, Crown, Cpu, Gamepad2, Shirt, Music, Dumbbell, Skull, Snowflake } from "lucide-react";
 
 export interface BioLinkTheme {
   id: string;
@@ -69,6 +69,22 @@ export const bioLinkThemes: BioLinkTheme[] = [
     category: 'free'
   },
   // Premium Themes
+  {
+    id: 'halloween',
+    name: 'Halloween',
+    description: 'Spooky theme with floating pumpkins, bats, and eerie animations',
+    isPremium: true,
+    icon: Skull,
+    category: 'premium'
+  },
+  {
+    id: 'christmas',
+    name: 'Christmas',
+    description: 'Festive theme with falling snow, twinkling stars, and holiday cheer',
+    isPremium: true,
+    icon: Snowflake,
+    category: 'premium'
+  },
   {
     id: 'professional',
     name: 'Professional',

@@ -52,6 +52,7 @@ const AffiliateDashboard = () => {
     removeSocialLink,
     toggleCategory,
     updateTheme,
+    previewThemeChange,
   } = useBioLink(user?.id);
 
   useEffect(() => {
@@ -387,6 +388,7 @@ const AffiliateDashboard = () => {
                 <ThemeSelector 
                   currentTheme={currentTheme}
                   onThemeSelect={updateTheme}
+                  onPreview={previewThemeChange}
                 />
               </CardContent>
             </Card>
