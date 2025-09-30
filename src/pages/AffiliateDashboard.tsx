@@ -25,6 +25,8 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import SEO from "@/components/SEO";
 import { pageSEO } from "@/data/seoData";
+import SocialPlatformSelect from "@/components/SocialPlatformSelect";
+import { getPlatformById } from "@/utils/socialPlatforms";
 
 const AffiliateDashboard = () => {
   const { user, isLoading } = useAuth();
@@ -32,7 +34,7 @@ const AffiliateDashboard = () => {
   const { toast } = useToast();
   const [profile, setProfile] = useState<any>(null);
   const [categories, setCategories] = useState<any[]>([]);
-  const [newSocialPlatform, setNewSocialPlatform] = useState("");
+  const [newSocialPlatform, setNewSocialPlatform] = useState<string>("");
   const [newSocialUrl, setNewSocialUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -83,15 +85,16 @@ const AffiliateDashboard = () => {
   };
 
   const handleAddSocialLink = async () => {
-    if (!newSocialPlatform || !newSocialUrl) {
+    if (!newSocialPlatform || !newSocialUrl.trim()) {
       toast({
         title: "Missing information",
-        description: "Please enter both platform and URL",
+        description: "Please select a platform and enter URL",
         variant: "destructive",
       });
       return;
     }
-    await addSocialLink(newSocialPlatform, newSocialUrl);
+    const platform = getPlatformById(newSocialPlatform);
+    await addSocialLink(platform?.name || newSocialPlatform, newSocialUrl);
     setNewSocialPlatform("");
     setNewSocialUrl("");
   };
@@ -312,14 +315,14 @@ const AffiliateDashboard = () => {
                     ))}
 
                     <div className="flex items-center gap-2">
+                      <div className="w-48">
+                        <SocialPlatformSelect
+                          value={newSocialPlatform}
+                          onValueChange={setNewSocialPlatform}
+                        />
+                      </div>
                       <Input
-                        placeholder="Platform (e.g., Instagram)"
-                        value={newSocialPlatform}
-                        onChange={(e) => setNewSocialPlatform(e.target.value)}
-                        className="w-32"
-                      />
-                      <Input
-                        placeholder="URL"
+                        placeholder={getPlatformById(newSocialPlatform)?.placeholder || "Enter URL"}
                         value={newSocialUrl}
                         onChange={(e) => setNewSocialUrl(e.target.value)}
                         className="flex-1"

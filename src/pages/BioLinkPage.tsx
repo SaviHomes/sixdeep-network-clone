@@ -4,17 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  Instagram, 
-  Twitter, 
-  Youtube, 
-  Facebook, 
-  Linkedin,
-  Share2,
-  ExternalLink,
-  Users
-} from "lucide-react";
+import { Share2, ExternalLink, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import SocialIcon from "@/components/SocialIcon";
 
 interface Profile {
   id: string;
@@ -158,17 +150,6 @@ const BioLinkPage = () => {
     }
   };
 
-  const getSocialIcon = (platform: string) => {
-    const icons: Record<string, any> = {
-      instagram: Instagram,
-      twitter: Twitter,
-      youtube: Youtube,
-      facebook: Facebook,
-      linkedin: Linkedin,
-    };
-    const Icon = icons[platform.toLowerCase()] || ExternalLink;
-    return <Icon className="h-5 w-5" />;
-  };
 
   const handleCategoryClick = (category: Category) => {
     trackClick("category_click", { categoryId: category.id, categoryName: category.name });
@@ -246,13 +227,13 @@ const BioLinkPage = () => {
                 key={index}
                 variant="outline"
                 size="icon"
-                className="rounded-full"
+                className="rounded-full hover:scale-110 transition-transform"
                 onClick={() => {
                   trackClick("social_click", { platform: link.platform });
                   window.open(link.url, "_blank");
                 }}
               >
-                {getSocialIcon(link.platform)}
+                <SocialIcon platform={link.platform} />
               </Button>
             ))}
           </div>
