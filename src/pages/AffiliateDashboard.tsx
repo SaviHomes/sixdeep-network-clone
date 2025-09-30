@@ -46,6 +46,8 @@ const AffiliateDashboard = () => {
     selectedCategories,
     isLoading: bioLinkLoading,
     currentTheme,
+    isPreviewMode,
+    previewTheme,
     createBioLink,
     updateBioLink,
     addSocialLink,
@@ -53,6 +55,7 @@ const AffiliateDashboard = () => {
     toggleCategory,
     updateTheme,
     previewThemeChange,
+    clearPreview,
   } = useBioLink(user?.id);
 
   useEffect(() => {
@@ -389,6 +392,9 @@ const AffiliateDashboard = () => {
                   currentTheme={currentTheme}
                   onThemeSelect={updateTheme}
                   onPreview={previewThemeChange}
+                  onClearPreview={clearPreview}
+                  isPreviewMode={isPreviewMode}
+                  previewTheme={previewTheme}
                 />
               </CardContent>
             </Card>

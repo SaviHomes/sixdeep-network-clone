@@ -12,9 +12,12 @@ interface ThemeSelectorProps {
   currentTheme: string;
   onThemeSelect: (themeId: string) => void;
   onPreview?: (themeId: string) => void;
+  onClearPreview?: () => void;
+  isPreviewMode?: boolean;
+  previewTheme?: string | null;
 }
 
-const ThemeSelector = ({ currentTheme, onThemeSelect, onPreview }: ThemeSelectorProps) => {
+const ThemeSelector = ({ currentTheme, onThemeSelect, onPreview, onClearPreview, isPreviewMode, previewTheme }: ThemeSelectorProps) => {
   const { subscriptionStatus, session, refreshSubscription } = useAuth();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
@@ -70,6 +73,32 @@ const ThemeSelector = ({ currentTheme, onThemeSelect, onPreview }: ThemeSelector
 
   return (
     <div className="space-y-8">
+      {/* Preview Mode Banner */}
+      {isPreviewMode && previewTheme && (
+        <Card className="p-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Eye className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <div>
+                <h4 className="font-semibold text-foreground">Preview Mode</h4>
+                <p className="text-sm text-muted-foreground">
+                  You're previewing a theme. {subscriptionStatus.subscribed ? 'Save it or exit preview.' : 'Subscribe to save this theme.'}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              {subscriptionStatus.subscribed && (
+                <Button onClick={() => onThemeSelect(previewTheme)} variant="default">
+                  Apply Theme
+                </Button>
+              )}
+              <Button onClick={onClearPreview} variant="outline">
+                Exit Preview
+              </Button>
+            </div>
+          </div>
+        </Card>
+      )}
       {/* Free Themes Section */}
       <div>
         <div className="flex items-center gap-2 mb-4">
