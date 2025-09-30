@@ -28,11 +28,9 @@ export default function AwinManagement() {
   const [isImporting, setIsImporting] = useState(false);
   const [categoryId, setCategoryId] = useState("");
   const [advertiserId, setAdvertiserId] = useState("");
-  const [limit, setLimit] = useState("100");
+  const [limit, setLimit] = useState("1000");
   const [importLogs, setImportLogs] = useState<ImportLog[]>([]);
   const [isLoadingLogs, setIsLoadingLogs] = useState(false);
-  const [csvFile, setCsvFile] = useState<File | null>(null);
-  const [importMode, setImportMode] = useState<"api" | "csv">("csv");
 
   useEffect(() => {
     if (isAdmin) {
@@ -64,7 +62,7 @@ export default function AwinManagement() {
   };
 
   const handleImport = async () => {
-    if (importMode === "api" && !advertiserId) {
+    if (!advertiserId.trim()) {
       toast({
         title: "Missing Advertiser ID",
         description: "Please enter an Advertiser ID to import products",
@@ -73,34 +71,13 @@ export default function AwinManagement() {
       return;
     }
 
-    if (importMode === "csv" && !csvFile) {
-      toast({
-        title: "Missing CSV File",
-        description: "Please select a CSV file to upload",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsImporting(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        throw new Error('Not authenticated');
-      }
-
-      let csvContent: string | undefined;
-      if (importMode === "csv" && csvFile) {
-        csvContent = await csvFile.text();
-      }
-
       const { data, error } = await supabase.functions.invoke('awin-import-products', {
         body: {
-          categoryId: categoryId || null,
-          advertiserId: importMode === "api" ? advertiserId : undefined,
-          limit: parseInt(limit) || 100,
-          csvContent,
+          categoryId: categoryId.trim() || null,
+          advertiserId: advertiserId.trim(),
+          limit: parseInt(limit) || 1000,
         },
       });
 
@@ -115,9 +92,9 @@ export default function AwinManagement() {
         description: `Imported: ${data.productsImported}, Updated: ${data.productsUpdated}, Failed: ${data.productsFailed}`,
       });
 
-      setCsvFile(null);
       setCategoryId("");
       setAdvertiserId("");
+      setLimit("1000");
       await loadImportLogs();
     } catch (error: any) {
       console.error('Import error:', error);
@@ -157,134 +134,92 @@ export default function AwinManagement() {
     <div className="container mx-auto py-8 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Awin Product Management</h1>
-        <p className="text-muted-foreground">Import and manage products from Awin affiliate network</p>
+        <p className="text-muted-foreground">Automated product imports from Awin affiliate network</p>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Download className="h-5 w-5" />
-            Import Products
+            Automated Product Import
           </CardTitle>
           <CardDescription>
-            Upload CSV file or use API to import products from Awin
+            Automatically fetch and import products from Awin advertisers using their API
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex gap-4 mb-4">
-            <Button
-              variant={importMode === "csv" ? "default" : "outline"}
-              onClick={() => setImportMode("csv")}
-              disabled={isImporting}
-            >
-              CSV Upload (Recommended)
-            </Button>
-            <Button
-              variant={importMode === "api" ? "default" : "outline"}
-              onClick={() => setImportMode("api")}
-              disabled={isImporting}
-            >
-              API Import
-            </Button>
+          <div className="bg-muted/50 p-4 rounded-lg space-y-2 text-sm">
+            <p className="font-medium">How it works:</p>
+            <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+              <li>Connects directly to Awin's Product Feed API</li>
+              <li>Fetches up to 1000 products per import from the specified advertiser</li>
+              <li>Automatically updates existing products or adds new ones</li>
+              <li>Supports both Enhanced Feed and standard Product Data APIs</li>
+            </ul>
           </div>
 
-          {importMode === "csv" ? (
-            <>
-              <div className="bg-muted/50 p-4 rounded-lg space-y-2 text-sm">
-                <p className="font-medium">CSV Upload Instructions:</p>
-                <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-                  <li>Download product feed CSV from your Awin dashboard</li>
-                  <li>Select the CSV file below to import</li>
-                  <li>All products in the CSV will be imported or updated</li>
-                </ol>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="csvFile">CSV File</Label>
-                <Input
-                  id="csvFile"
-                  type="file"
-                  accept=".csv"
-                  onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
-                  disabled={isImporting}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="categoryId">Category ID (Optional)</Label>
-                <Input
-                  id="categoryId"
-                  placeholder="e.g., 1234"
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                  disabled={isImporting}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="bg-muted/50 p-4 rounded-lg space-y-2 text-sm">
-                <p className="font-medium">API Import Instructions:</p>
-                <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-                  <li>Find your Advertiser ID in your Awin dashboard under "My Programmes"</li>
-                  <li>The Advertiser ID is required - it identifies which merchant's products to import</li>
-                  <li>Each import fetches products from a single advertiser</li>
-                </ol>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="space-y-2">
-                  <Label htmlFor="categoryId">Category ID (Optional)</Label>
-                  <Input
-                    id="categoryId"
-                    placeholder="e.g., 1234"
-                    value={categoryId}
-                    onChange={(e) => setCategoryId(e.target.value)}
-                    disabled={isImporting}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="advertiserId">
-                    Advertiser ID <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="advertiserId"
-                    placeholder="e.g., 5678"
-                    value={advertiserId}
-                    onChange={(e) => setAdvertiserId(e.target.value)}
-                    disabled={isImporting}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="limit">Product Limit</Label>
-                  <Input
-                    id="limit"
-                    type="number"
-                    placeholder="100"
-                    value={limit}
-                    onChange={(e) => setLimit(e.target.value)}
-                    disabled={isImporting}
-                  />
-                </div>
-              </div>
-            </>
-          )}
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-2">
+              <Label htmlFor="advertiserId">
+                Advertiser ID <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="advertiserId"
+                placeholder="e.g., 5678"
+                value={advertiserId}
+                onChange={(e) => setAdvertiserId(e.target.value)}
+                disabled={isImporting}
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                Find in Awin dashboard under "My Programmes"
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="categoryId">Category ID (Optional)</Label>
+              <Input
+                id="categoryId"
+                placeholder="e.g., 1234"
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                disabled={isImporting}
+              />
+              <p className="text-xs text-muted-foreground">
+                Filter by Awin category
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="limit">Product Limit</Label>
+              <Input
+                id="limit"
+                type="number"
+                placeholder="1000"
+                value={limit}
+                onChange={(e) => setLimit(e.target.value)}
+                disabled={isImporting}
+              />
+              <p className="text-xs text-muted-foreground">
+                Max products per import
+              </p>
+            </div>
+          </div>
 
           <Button 
             onClick={handleImport} 
-            disabled={isImporting || (importMode === "api" && !advertiserId) || (importMode === "csv" && !csvFile)}
+            disabled={isImporting || !advertiserId}
             className="w-full md:w-auto"
           >
             {isImporting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Importing...
+                Importing Products...
               </>
             ) : (
               <>
                 <Download className="mr-2 h-4 w-4" />
-                Start Import
+                Start Automated Import
               </>
             )}
           </Button>
