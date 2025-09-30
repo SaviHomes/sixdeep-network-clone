@@ -414,7 +414,7 @@ const Auth = () => {
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="profile-image">Upload Profile Image</Label>
+                      <Label htmlFor="profile-image">Upload Profile Image (Optional)</Label>
                       <div className="flex items-center gap-4">
                         {profileImagePreview && (
                           <img
@@ -425,7 +425,7 @@ const Auth = () => {
                         )}
                         <Label
                           htmlFor="profile-image"
-                          className="flex items-center gap-2 cursor-pointer px-4 py-2 border border-input rounded-md hover:bg-accent"
+                          className="flex items-center gap-2 cursor-pointer px-4 py-2 border border-input rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
                         >
                           <Upload className="h-4 w-4" />
                           <span className="text-sm">{profileImage ? "Change Image" : "Upload Image"}</span>
