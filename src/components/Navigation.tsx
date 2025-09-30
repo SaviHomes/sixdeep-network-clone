@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Menu, X, User } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/sixdeep-logo.webp";
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -20,10 +21,8 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-primary-foreground rounded-full flex items-center justify-center">
-              <span className="text-primary font-bold text-xl">6</span>
-            </div>
+          <Link to="/" className="flex items-center space-x-3">
+            <img src={logo} alt="SixDeep Logo" className="h-10 w-auto" />
             <span className="text-2xl font-bold">sixdeep</span>
           </Link>
 
