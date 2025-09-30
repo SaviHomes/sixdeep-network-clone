@@ -39,13 +39,16 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let importLog: any = null;
+  let supabase: any = null;
+
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const awinApiToken = Deno.env.get('AWIN_API_TOKEN')!;
     const awinPublisherId = Deno.env.get('AWIN_PUBLISHER_ID')!;
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const { 
       categoryId, 
@@ -75,7 +78,7 @@ Deno.serve(async (req) => {
     }
 
     // Create import log
-    const { data: importLog, error: logError } = await supabase
+    const { data: logData, error: logError } = await supabase
       .from('awin_import_logs')
       .insert({
         status: 'running',
@@ -87,6 +90,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (logError) throw logError;
+    importLog = logData;
 
     console.log('Starting Awin product import', { importLogId: importLog.id });
 
@@ -99,32 +103,82 @@ Deno.serve(async (req) => {
     // https://api.awin.com/publishers/{PUBLISHER_ID}/awinfeeds/download/{ADVERTISER_ID}-{VERTICAL}-{LOCALE}
     const vertical = 'retail';
     const locale = 'en_GB';
-    const awinUrl = `https://api.awin.com/publishers/${awinPublisherId}/awinfeeds/download/${advertiserId}-${vertical}-${locale}.jsonl`;
+    
+    // Try multiple format variations to find available feed
+    const formats = ['.jsonl', '.json', '.csv', ''];
+    let awinResponse: Response | null = null;
+    let successfulFormat = '';
+    let lastError = '';
 
-    console.log('Fetching from Awin API:', awinUrl);
+    console.log(`Attempting to fetch feed for advertiser ${advertiserId}...`);
 
-    // Fetch products from Awin using correct Bearer token authentication
-    const awinResponse = await fetch(awinUrl, {
-      headers: {
-        'Authorization': `Bearer ${awinApiToken}`,
-      },
-    });
+    // Try each format until one works
+    for (const format of formats) {
+      const awinUrl = `https://api.awin.com/publishers/${awinPublisherId}/awinfeeds/download/${advertiserId}-${vertical}-${locale}${format}`;
+      
+      console.log(`Trying format: ${format || 'no extension'} - URL: ${awinUrl}`);
+      
+      try {
+        const response = await fetch(awinUrl, {
+          headers: {
+            'Authorization': `Bearer ${awinApiToken}`,
+          },
+        });
 
-    if (!awinResponse.ok) {
-      const errorText = await awinResponse.text();
-      console.error('Awin API error response:', errorText);
-      throw new Error(`Awin API error: ${awinResponse.status} ${awinResponse.statusText} - ${errorText}`);
+        if (response.ok) {
+          awinResponse = response;
+          successfulFormat = format;
+          console.log(`Success! Feed found with format: ${format || 'no extension'}`);
+          break;
+        } else {
+          const errorText = await response.text();
+          lastError = `${response.status} ${response.statusText} - ${errorText}`;
+          console.log(`Format ${format || 'no extension'} failed: ${lastError}`);
+        }
+      } catch (error) {
+        lastError = error instanceof Error ? error.message : 'Unknown error';
+        console.log(`Format ${format || 'no extension'} failed with exception: ${lastError}`);
+      }
     }
 
-    // Parse JSONL format (JSON Lines - one JSON object per line)
-    const responseText = await awinResponse.text();
-    const lines = responseText.trim().split('\n');
-    const products: AwinProduct[] = lines
-      .filter(line => line.trim())
-      .map(line => JSON.parse(line))
-      .slice(0, limit); // Apply limit
+    if (!awinResponse || !awinResponse.ok) {
+      console.error('All format attempts failed. Last error:', lastError);
+      throw new Error(`Unable to fetch feed for advertiser ${advertiserId}. Please verify:\n1. Advertiser ID is correct\n2. You have access to this advertiser's program\n3. The advertiser has an active product feed\n\nLast error: ${lastError}`);
+    }
 
-    console.log(`Fetched ${products.length} products from Awin`);
+    // Parse response based on format
+    const responseText = await awinResponse.text();
+    let products: AwinProduct[] = [];
+
+    if (successfulFormat === '.jsonl' || successfulFormat === '') {
+      // Parse JSONL format (JSON Lines - one JSON object per line)
+      const lines = responseText.trim().split('\n');
+      products = lines
+        .filter(line => line.trim())
+        .map(line => {
+          try {
+            return JSON.parse(line);
+          } catch (e) {
+            console.error('Failed to parse line:', line);
+            return null;
+          }
+        })
+        .filter(p => p !== null)
+        .slice(0, limit);
+    } else if (successfulFormat === '.json') {
+      // Parse standard JSON array
+      try {
+        const jsonData = JSON.parse(responseText);
+        products = (Array.isArray(jsonData) ? jsonData : jsonData.products || []).slice(0, limit);
+      } catch (e) {
+        console.error('Failed to parse JSON:', e);
+        throw new Error('Invalid JSON format in response');
+      }
+    } else if (successfulFormat === '.csv') {
+      throw new Error('CSV format is not yet supported. Please contact support to enable CSV parsing.');
+    }
+
+    console.log(`Successfully parsed ${products.length} products from Awin feed (format: ${successfulFormat})`);
 
     let imported = 0;
     let updated = 0;
@@ -196,19 +250,28 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Update import log
+    // Update import log with success
+    const logUpdate = {
+      status: 'completed',
+      completed_at: new Date().toISOString(),
+      products_imported: imported,
+      products_updated: updated,
+      products_failed: failed,
+      error_message: null,
+    };
+
     await supabase
       .from('awin_import_logs')
-      .update({
-        status: 'completed',
-        completed_at: new Date().toISOString(),
-        products_imported: imported,
-        products_updated: updated,
-        products_failed: failed,
-      })
+      .update(logUpdate)
       .eq('id', importLog.id);
 
-    console.log('Import completed', { imported, updated, failed });
+    console.log('Import completed successfully', { 
+      imported, 
+      updated, 
+      failed, 
+      total: products.length,
+      format: successfulFormat 
+    });
 
     return new Response(
       JSON.stringify({
@@ -225,8 +288,28 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Import error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    
+    // Update import log with failure if it exists
+    try {
+      if (importLog?.id) {
+        await supabase
+          .from('awin_import_logs')
+          .update({
+            status: 'failed',
+            completed_at: new Date().toISOString(),
+            error_message: errorMessage,
+          })
+          .eq('id', importLog.id);
+      }
+    } catch (logError) {
+      console.error('Failed to update error log:', logError);
+    }
+
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ 
+        error: errorMessage,
+        details: 'Check the logs for more information. Ensure your API credentials are correct and you have access to the advertiser program.'
+      }),
       {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

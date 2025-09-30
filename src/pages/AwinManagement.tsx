@@ -87,7 +87,12 @@ export default function AwinManagement() {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        // Enhanced error handling
+        const errorMsg = data?.error || error.message;
+        const errorDetails = data?.details || '';
+        throw new Error(`${errorMsg}${errorDetails ? '\n\n' + errorDetails : ''}`);
+      }
 
       toast({
         title: "Import Completed",
