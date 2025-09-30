@@ -56,6 +56,165 @@ export type Database = {
         }
         Relationships: []
       }
+      bio_link_analytics: {
+        Row: {
+          bio_link_id: string
+          created_at: string | null
+          event_data: Json | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          bio_link_id: string
+          created_at?: string | null
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          bio_link_id?: string
+          created_at?: string | null
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bio_link_analytics_bio_link_id_fkey"
+            columns: ["bio_link_id"]
+            isOneToOne: false
+            referencedRelation: "bio_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bio_link_product_categories: {
+        Row: {
+          bio_link_id: string
+          category_id: string
+          created_at: string | null
+          display_order: number | null
+          id: string
+          is_visible: boolean | null
+        }
+        Insert: {
+          bio_link_id: string
+          category_id: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_visible?: boolean | null
+        }
+        Update: {
+          bio_link_id?: string
+          category_id?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_visible?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bio_link_product_categories_bio_link_id_fkey"
+            columns: ["bio_link_id"]
+            isOneToOne: false
+            referencedRelation: "bio_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bio_link_product_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bio_link_social_links: {
+        Row: {
+          bio_link_id: string
+          created_at: string | null
+          display_order: number | null
+          id: string
+          is_visible: boolean | null
+          platform: string
+          url: string
+        }
+        Insert: {
+          bio_link_id: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_visible?: boolean | null
+          platform: string
+          url: string
+        }
+        Update: {
+          bio_link_id?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          is_visible?: boolean | null
+          platform?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bio_link_social_links_bio_link_id_fkey"
+            columns: ["bio_link_id"]
+            isOneToOne: false
+            referencedRelation: "bio_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bio_links: {
+        Row: {
+          bio: string | null
+          created_at: string | null
+          display_order: Json | null
+          id: string
+          is_active: boolean | null
+          theme_color: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string | null
+          display_order?: Json | null
+          id?: string
+          is_active?: boolean | null
+          theme_color?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string | null
+          display_order?: Json | null
+          id?: string
+          is_active?: boolean | null
+          theme_color?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bio_links_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string | null
