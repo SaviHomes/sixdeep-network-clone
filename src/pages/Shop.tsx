@@ -1,9 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import SEO from "@/components/SEO";
+import { pageSEO } from "@/data/seoData";
+import { generateBreadcrumbSchema } from "@/utils/seo";
 
 interface Category {
   id: string;
@@ -28,8 +31,19 @@ const Catalog = () => {
     },
   });
 
+  const breadcrumbs = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Shop", url: "/shop" }
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title={pageSEO.shop.title}
+        description={pageSEO.shop.description}
+        keywords={pageSEO.shop.keywords}
+        structuredData={breadcrumbs}
+      />
       <Navigation />
       
       <main className="container mx-auto px-4 py-12">
@@ -70,7 +84,7 @@ const Catalog = () => {
                       {category.image_url ? (
                         <img
                           src={category.image_url}
-                          alt={category.name}
+                          alt={`${category.name} category - Browse affiliate products and earn commissions`}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (

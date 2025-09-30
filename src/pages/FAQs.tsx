@@ -5,6 +5,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import SEO from "@/components/SEO";
+import { pageSEO } from "@/data/seoData";
+import { generateFAQSchema, generateBreadcrumbSchema } from "@/utils/seo";
 
 const FAQs = () => {
   const faqs = [
@@ -50,8 +53,21 @@ const FAQs = () => {
     },
   ];
 
+  const faqSchema = generateFAQSchema(faqs);
+  
+  const breadcrumbs = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "FAQs", url: "/faqs" }
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title={pageSEO.faqs.title}
+        description={pageSEO.faqs.description}
+        keywords={pageSEO.faqs.keywords}
+        structuredData={[faqSchema, breadcrumbs]}
+      />
       <Navigation />
       
       <main className="container mx-auto px-4 py-12">

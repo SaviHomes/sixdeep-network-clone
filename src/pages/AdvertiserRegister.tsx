@@ -16,6 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import SEO from "@/components/SEO";
+import { pageSEO } from "@/data/seoData";
 
 const advertiserSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),

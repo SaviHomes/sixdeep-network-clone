@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import SEO from "@/components/SEO";
+import { pageSEO } from "@/data/seoData";
 
 const AdvertiserLogin = () => {
   const [email, setEmail] = useState("");
@@ -36,6 +38,12 @@ const AdvertiserLogin = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title={pageSEO.advertiserLogin.title}
+        description={pageSEO.advertiserLogin.description}
+        keywords={pageSEO.advertiserLogin.keywords}
+        noindex={true}
+      />
       <Navigation />
       
       <main className="container mx-auto px-4 py-12">

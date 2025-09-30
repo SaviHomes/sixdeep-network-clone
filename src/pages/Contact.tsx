@@ -8,6 +8,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
+import SEO from "@/components/SEO";
+import { pageSEO } from "@/data/seoData";
+import { generateBreadcrumbSchema } from "@/utils/seo";
 
 const contactFormSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
@@ -61,8 +64,19 @@ const Contact = () => {
     }
   };
 
+  const breadcrumbs = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Contact", url: "/contact" }
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title={pageSEO.contact.title}
+        description={pageSEO.contact.description}
+        keywords={pageSEO.contact.keywords}
+        structuredData={breadcrumbs}
+      />
       <Navigation />
       
       <main className="container mx-auto px-4 py-12">

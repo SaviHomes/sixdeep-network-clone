@@ -6,10 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ExternalLink } from "lucide-react";
+import SEO from "@/components/SEO";
+import { generateBreadcrumbSchema } from "@/utils/seo";
 
 interface Category {
   id: string;
   name: string;
+  slug: string;
   description: string | null;
   image_url: string | null;
 }
@@ -59,8 +62,28 @@ const CategoryDetail = () => {
     enabled: !!category?.id,
   });
 
+  const breadcrumbs = category ? generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Shop", url: "/shop" },
+    { name: category.name, url: `/category/${slug}` }
+  ]) : null;
+
+  const seoTitle = category 
+    ? `${category.name} - Affiliate Products | Sixdeep`
+    : "Category - Sixdeep";
+  
+  const seoDescription = category?.description 
+    ? `Discover ${category.name} products and earn commissions. ${category.description}`
+    : "Browse affiliate products and earn commissions on every sale.";
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title={seoTitle}
+        description={seoDescription}
+        keywords={`${category?.name || 'affiliate'} products, commission earning, affiliate marketing, ${category?.slug || 'products'}`}
+        structuredData={breadcrumbs}
+      />
       <Navigation />
       
       <main className="container mx-auto px-4 py-12">
@@ -80,7 +103,7 @@ const CategoryDetail = () => {
               <div className="h-64 rounded-lg overflow-hidden mb-6">
                 <img
                   src={category.image_url}
-                  alt={category.name}
+                  alt={`${category.name} affiliate products category banner - earn commissions on ${category.name} products`}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -125,7 +148,7 @@ const CategoryDetail = () => {
                     {product.image_url ? (
                       <img
                         src={product.image_url}
-                        alt={product.name}
+                        alt={`${product.name} - Affiliate product with ${product.commission_rate}% commission rate. Price: $${product.price}`}
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       />
                     ) : (

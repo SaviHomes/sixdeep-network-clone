@@ -23,6 +23,8 @@ import {
   Check
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import SEO from "@/components/SEO";
+import { pageSEO } from "@/data/seoData";
 
 const AffiliateDashboard = () => {
   const { user, isLoading } = useAuth();
@@ -126,6 +128,12 @@ const AffiliateDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title={pageSEO.affiliateDashboard.title}
+        description={pageSEO.affiliateDashboard.description}
+        keywords={pageSEO.affiliateDashboard.keywords}
+        noindex={true}
+      />
       <Navigation />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">

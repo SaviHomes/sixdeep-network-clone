@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { CheckCircle, Zap, TrendingUp, Users } from "lucide-react";
+import SEO from "@/components/SEO";
+import { pageSEO } from "@/data/seoData";
+import { generateBreadcrumbSchema } from "@/utils/seo";
 
 const Affiliate = () => {
   const benefits = [
@@ -28,8 +31,19 @@ const Affiliate = () => {
     },
   ];
 
+  const breadcrumbs = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Become an Affiliate", url: "/affiliate" }
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title={pageSEO.affiliate.title}
+        description={pageSEO.affiliate.description}
+        keywords={pageSEO.affiliate.keywords}
+        structuredData={breadcrumbs}
+      />
       <Navigation />
       
       <main>

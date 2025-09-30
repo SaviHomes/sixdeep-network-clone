@@ -4,6 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { ArrowRight, Users, TrendingUp, Shield, Zap } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
+import SEO from "@/components/SEO";
+import { pageSEO } from "@/data/seoData";
+import { organizationSchema, websiteSchema } from "@/utils/seo";
 
 const Index = () => {
   const features = [
@@ -31,6 +34,12 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title={pageSEO.home.title}
+        description={pageSEO.home.description}
+        keywords={pageSEO.home.keywords}
+        structuredData={[organizationSchema, websiteSchema]}
+      />
       <Navigation />
       
       <main>

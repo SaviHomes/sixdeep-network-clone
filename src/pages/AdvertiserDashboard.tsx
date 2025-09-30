@@ -4,6 +4,8 @@ import { useAuth } from "@/hooks/useAuth";
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Package, Eye, MousePointerClick, DollarSign } from "lucide-react";
+import SEO from "@/components/SEO";
+import { pageSEO } from "@/data/seoData";
 
 const AdvertiserDashboard = () => {
   const { user, isLoading } = useAuth();
@@ -25,6 +27,12 @@ const AdvertiserDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title={pageSEO.advertiserDashboard.title}
+        description={pageSEO.advertiserDashboard.description}
+        keywords={pageSEO.advertiserDashboard.keywords}
+        noindex={true}
+      />
       <Navigation />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">

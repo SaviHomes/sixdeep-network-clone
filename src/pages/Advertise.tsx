@@ -3,10 +3,24 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Shield, TrendingUp, Users, Target, DollarSign, BarChart3 } from "lucide-react";
+import SEO from "@/components/SEO";
+import { pageSEO } from "@/data/seoData";
+import { generateBreadcrumbSchema } from "@/utils/seo";
 
 const Advertise = () => {
+  const breadcrumbs = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Advertise", url: "/advertise" }
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title={pageSEO.advertise.title}
+        description={pageSEO.advertise.description}
+        keywords={pageSEO.advertise.keywords}
+        structuredData={breadcrumbs}
+      />
       <Navigation />
       
       <main>
