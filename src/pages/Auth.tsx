@@ -8,9 +8,13 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CalendarIcon, Upload } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }).max(255),
@@ -18,8 +22,11 @@ const loginSchema = z.object({
 });
 
 const signupSchema = z.object({
+  firstName: z.string().trim().min(1, { message: "First name is required" }).max(50),
+  lastName: z.string().trim().min(1, { message: "Last name is required" }).max(50),
   username: z.string().trim().min(3, { message: "Username must be at least 3 characters" }).max(50),
   email: z.string().trim().email({ message: "Please enter a valid email address" }).max(255),
+  dateOfBirth: z.date().optional(),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }).max(255),
   confirmPassword: z.string().max(255),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -37,8 +44,13 @@ const Auth = () => {
   const [loginPassword, setLoginPassword] = useState('');
   
   // Signup form state
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [signupUsername, setSignupUsername] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState<Date>();
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [profileImagePreview, setProfileImagePreview] = useState<string>('');
   const [signupPassword, setSignupPassword] = useState('');
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
 
@@ -78,13 +90,28 @@ const Auth = () => {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfileImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
       const validated = signupSchema.parse({
+        firstName,
+        lastName,
         username: signupUsername,
         email: signupEmail,
+        dateOfBirth,
         password: signupPassword,
         confirmPassword: signupConfirmPassword,
       });
@@ -110,6 +137,27 @@ const Auth = () => {
       }
 
       if (data.user) {
+        let avatarUrl = null;
+
+        // Upload profile image if provided
+        if (profileImage) {
+          const fileExt = profileImage.name.split('.').pop();
+          const fileName = `${data.user.id}/avatar.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(fileName, profileImage, { upsert: true });
+
+          if (uploadError) {
+            console.error('Avatar upload error:', uploadError);
+          } else {
+            const { data: { publicUrl } } = supabase.storage
+              .from('avatars')
+              .getPublicUrl(fileName);
+            avatarUrl = publicUrl;
+          }
+        }
+
         // Create profile
         const { error: profileError } = await supabase
           .from('profiles')
@@ -117,6 +165,9 @@ const Auth = () => {
             id: data.user.id,
             username: validated.username,
             email: validated.email,
+            full_name: `${validated.firstName} ${validated.lastName}`,
+            date_of_birth: validated.dateOfBirth ? format(validated.dateOfBirth, 'yyyy-MM-dd') : null,
+            avatar_url: avatarUrl,
           });
 
         if (profileError) {
@@ -265,18 +316,54 @@ const Auth = () => {
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSignup} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="first-name">
+                          First Name <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="first-name"
+                          type="text"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          required
+                          disabled={isLoading}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="last-name">
+                          Last Name <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="last-name"
+                          type="text"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          required
+                          disabled={isLoading}
+                        />
+                      </div>
+                    </div>
+                    
                     <div className="space-y-2">
                       <Label htmlFor="signup-username">
                         Username <span className="text-destructive">*</span>
                       </Label>
-                      <Input
-                        id="signup-username"
-                        type="text"
-                        value={signupUsername}
-                        onChange={(e) => setSignupUsername(e.target.value)}
-                        required
-                        disabled={isLoading}
-                      />
+                      <div className="relative">
+                        <Input
+                          id="signup-username"
+                          type="text"
+                          value={signupUsername}
+                          onChange={(e) => setSignupUsername(e.target.value)}
+                          className="pl-32"
+                          required
+                          disabled={isLoading}
+                        />
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none">
+                          sixdeep.com/
+                        </span>
+                      </div>
                     </div>
                     
                     <div className="space-y-2">
@@ -291,6 +378,67 @@ const Auth = () => {
                         required
                         disabled={isLoading}
                       />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="date-of-birth">Date of Birth</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            id="date-of-birth"
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !dateOfBirth && "text-muted-foreground"
+                            )}
+                            disabled={isLoading}
+                            type="button"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dateOfBirth ? format(dateOfBirth, "PPP") : <span>Pick a date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={dateOfBirth}
+                            onSelect={setDateOfBirth}
+                            disabled={(date) =>
+                              date > new Date() || date < new Date("1900-01-01")
+                            }
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="profile-image">Upload Profile Image</Label>
+                      <div className="flex items-center gap-4">
+                        {profileImagePreview && (
+                          <img
+                            src={profileImagePreview}
+                            alt="Profile preview"
+                            className="w-16 h-16 rounded-full object-cover"
+                          />
+                        )}
+                        <Label
+                          htmlFor="profile-image"
+                          className="flex items-center gap-2 cursor-pointer px-4 py-2 border border-input rounded-md hover:bg-accent"
+                        >
+                          <Upload className="h-4 w-4" />
+                          <span className="text-sm">{profileImage ? "Change Image" : "Upload Image"}</span>
+                        </Label>
+                        <Input
+                          id="profile-image"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleImageChange}
+                          disabled={isLoading}
+                        />
+                      </div>
                     </div>
                     
                     <div className="space-y-2">
