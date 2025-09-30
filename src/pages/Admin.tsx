@@ -4,6 +4,7 @@ import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Shield, Database, Mail } from 'lucide-react';
+import UserManagement from '@/components/UserManagement';
 
 const Admin = () => {
   const { isLoading } = useAdmin();
@@ -58,6 +59,8 @@ const Admin = () => {
               </div>
             </CardContent>
           </Card>
+
+          <UserManagement />
 
           <Card className="mt-6 border-primary/20">
             <CardHeader>
