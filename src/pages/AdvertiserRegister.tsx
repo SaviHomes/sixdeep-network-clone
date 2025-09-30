@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const advertiserSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -24,6 +25,11 @@ const advertiserSchema = z.object({
   position: z.string().min(2, "Please enter your position"),
   companyName: z.string().min(2, "Please enter your company name"),
   website: z.string().url("Please enter a valid website URL").or(z.literal("")),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 type AdvertiserFormData = z.infer<typeof advertiserSchema>;
@@ -43,28 +49,68 @@ const AdvertiserRegister = () => {
       position: "",
       companyName: "",
       website: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
   const onSubmit = async (data: AdvertiserFormData) => {
     setIsSubmitting(true);
     try {
-      // TODO: Implement actual registration logic here
-      console.log("Advertiser registration data:", data);
+      const redirectUrl = `${window.location.origin}/`;
       
-      toast({
-        title: "Registration Successful",
-        description: "We'll be in touch with you soon!",
+      // Create Supabase auth account
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          emailRedirectTo: redirectUrl,
+        }
       });
-      
-      // Redirect to advertiser login or success page
-      setTimeout(() => {
-        navigate("/advertiser-login");
-      }, 2000);
-    } catch (error) {
+
+      if (signUpError) throw signUpError;
+
+      if (authData.user) {
+        // Create advertiser profile
+        const { error: advertiserError } = await supabase
+          .from('advertisers')
+          .insert({
+            user_id: authData.user.id,
+            first_name: data.firstName,
+            last_name: data.lastName,
+            contact_number: data.contactNumber,
+            email: data.email,
+            position: data.position,
+            company_name: data.companyName,
+            website: data.website || null,
+          });
+
+        if (advertiserError) throw advertiserError;
+
+        // Assign 'advertiser' role
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: authData.user.id,
+            role: 'advertiser'
+          });
+
+        if (roleError) throw roleError;
+
+        toast({
+          title: "Registration Successful",
+          description: "Redirecting to your dashboard...",
+        });
+        
+        setTimeout(() => {
+          navigate("/advertiser-dashboard");
+        }, 1500);
+      }
+    } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
         title: "Registration Failed",
-        description: "Please try again later.",
+        description: error.message || "Please try again later.",
         variant: "destructive",
       });
     } finally {
@@ -190,6 +236,36 @@ const AdvertiserRegister = () => {
                     </FormItem>
                   )}
                 />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="Enter password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="Confirm password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
                   {isSubmitting ? "Submitting..." : "Register as Advertiser"}

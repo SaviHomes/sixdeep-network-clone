@@ -21,7 +21,7 @@ import logo from "@/assets/sixdeep-logo.webp";
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, isAdmin, isLoading, logout } = useAuth();
+  const { user, isAdmin, isAdvertiser, isAffiliate, logout } = useAuth();
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -128,14 +128,56 @@ const Navigation = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="secondary" size="sm">
                     <Shield className="w-4 h-4 mr-2" />
-                    Logged in as Admin
+                    Admin
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-background z-50">
                   <DropdownMenuItem asChild>
                     <Link to="/admin" className="flex items-center cursor-pointer">
                       <Shield className="w-4 h-4 mr-2" />
-                      Admin Dashboard
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout} className="cursor-pointer">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : isAdvertiser ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="secondary" size="sm">
+                    <User className="w-4 h-4 mr-2" />
+                    Advertiser
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-background z-50">
+                  <DropdownMenuItem asChild>
+                    <Link to="/advertiser-dashboard" className="flex items-center cursor-pointer">
+                      <User className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout} className="cursor-pointer">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : isAffiliate ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="secondary" size="sm">
+                    <User className="w-4 h-4 mr-2" />
+                    Affiliate
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-background z-50">
+                  <DropdownMenuItem asChild>
+                    <Link to="/affiliate-dashboard" className="flex items-center cursor-pointer">
+                      <User className="w-4 h-4 mr-2" />
+                      Dashboard
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={logout} className="cursor-pointer">
@@ -149,7 +191,7 @@ const Navigation = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="secondary" size="sm">
                     <User className="w-4 h-4 mr-2" />
-                    {user.email}
+                    Account
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-background z-50">
@@ -231,6 +273,48 @@ const Navigation = () => {
                   <Button variant="secondary" size="sm" className="w-full">
                     <Shield className="w-4 h-4 mr-2" />
                     Admin Dashboard
+                  </Button>
+                </Link>
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => {
+                    logout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              </>
+            ) : isAdvertiser ? (
+              <>
+                <Link to="/advertiser-dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="secondary" size="sm" className="w-full">
+                    <User className="w-4 h-4 mr-2" />
+                    Advertiser Dashboard
+                  </Button>
+                </Link>
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => {
+                    logout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              </>
+            ) : isAffiliate ? (
+              <>
+                <Link to="/affiliate-dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="secondary" size="sm" className="w-full">
+                    <User className="w-4 h-4 mr-2" />
+                    Affiliate Dashboard
                   </Button>
                 </Link>
                 <Button 

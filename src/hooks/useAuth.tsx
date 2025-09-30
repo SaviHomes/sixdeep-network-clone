@@ -8,6 +8,8 @@ export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdvertiser, setIsAdvertiser] = useState(false);
+  const [isAffiliate, setIsAffiliate] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -46,19 +48,24 @@ export const useAuth = () => {
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId)
-        .eq('role', 'admin')
-        .maybeSingle();
+        .eq('user_id', userId);
 
       if (error) {
-        console.error('Error checking admin status:', error);
+        console.error('Error checking user roles:', error);
         setIsAdmin(false);
+        setIsAdvertiser(false);
+        setIsAffiliate(false);
       } else {
-        setIsAdmin(!!data);
+        const roles = data?.map(r => r.role) || [];
+        setIsAdmin(roles.includes('admin'));
+        setIsAdvertiser(roles.includes('advertiser'));
+        setIsAffiliate(roles.includes('user'));
       }
     } catch (error) {
-      console.error('Error in admin check:', error);
+      console.error('Error in role check:', error);
       setIsAdmin(false);
+      setIsAdvertiser(false);
+      setIsAffiliate(false);
     } finally {
       setIsLoading(false);
     }
@@ -87,6 +94,8 @@ export const useAuth = () => {
     user,
     session,
     isAdmin,
+    isAdvertiser,
+    isAffiliate,
     isLoading,
     logout,
   };

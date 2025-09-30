@@ -174,7 +174,22 @@ const Auth = () => {
           console.error('Profile creation error:', profileError);
         }
 
-        toast.success('Account created successfully! You can now log in.');
+        // Assign 'user' role for affiliate dashboard access
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: data.user.id,
+            role: 'user'
+          });
+
+        if (roleError) {
+          console.error('Role assignment error:', roleError);
+        }
+
+        toast.success('Account created successfully! Redirecting to your dashboard...');
+        setTimeout(() => {
+          navigate('/affiliate-dashboard');
+        }, 1500);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {

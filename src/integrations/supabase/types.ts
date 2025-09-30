@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      advertisers: {
+        Row: {
+          company_name: string
+          contact_number: string
+          created_at: string | null
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          position: string
+          updated_at: string | null
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          company_name: string
+          contact_number: string
+          created_at?: string | null
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          position: string
+          updated_at?: string | null
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          company_name?: string
+          contact_number?: string
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          position?: string
+          updated_at?: string | null
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string | null
@@ -271,7 +313,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "advertiser"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -399,7 +441,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "advertiser"],
     },
   },
 } as const
